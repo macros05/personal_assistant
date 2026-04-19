@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asistente Personal · Marcos</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="sidebar-inner">
+
+    <div class="sidebar-brand">
+      <div class="brand-avatar">M</div>
+      <div>
+        <div class="brand-name">Marcos</div>
+        <div class="brand-sub">AI Automation Engineer</div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div>
+      <div class="s-title" style="margin-bottom:8px">Acciones rápidas</div>
+      <div class="quick-actions">
+        <button class="qa-btn highlight" data-action="resumen">
+          <span class="icon">📋</span> Resumen del día
+        </button>
+        <button class="qa-btn" data-action="week">
+          <span class="icon">📅</span> Mi semana
+        </button>
+        <button class="qa-btn" data-action="finances">
+          <span class="icon">💰</span> Mis finanzas
+        </button>
+        <button class="qa-btn" data-action="wroclaw">
+          <span class="icon">✈️</span> Días hasta Wrocław
+        </button>
+        <button class="qa-btn" data-action="focus">
+          <span class="icon">🎯</span> ¿En qué enfocarme?
+        </button>
+      </div>
+    </div>
+
+    <!-- Today's events -->
+    <div id="today-section" style="display:none">
+      <div class="s-title" style="margin-bottom:8px">Hoy</div>
+      <div class="today-list" id="today-list">
+        <div class="today-empty">Cargando…</div>
+      </div>
+    </div>
+
+    <!-- Flight tracker -->
+    <div>
+      <div class="s-title" style="margin-bottom:8px">Próximo vuelo AGP → WRO</div>
+      <div id="flight-panel">
+        <div class="flight-card"><div class="flight-loading">Buscando vuelos…</div></div>
+      </div>
+    </div>
+
+    <!-- Google Calendar -->
+    <div>
+      <div class="s-title" style="margin-bottom:8px">Google Calendar</div>
+      <div id="cal-status-panel"><div class="cal-notice">Cargando…</div></div>
+    </div>
+
+    <!-- Personal context -->
+    <div>
+      <div class="ctx-section-header" style="margin-bottom:8px">
+        <span class="s-title">Contexto Personal</span>
+        <button class="ctx-add-btn" id="ctx-add-btn" title="Añadir clave">+</button>
+      </div>
+      <div class="ctx-list" id="ctx-list">
+        <div class="ctx-empty">Cargando…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="sidebar-action danger" id="clear-history-btn">
+      <span>🗑️</span> Borrar historial
+    </button>
+  </div>
+</aside>
+
+<!-- ── Main ── -->
+<main class="main">
+  <header class="chat-header">
+    <div class="status-dot"></div>
+    <span class="chat-header-title">Asistente Personal</span>
+    <span class="chat-header-sub">Gemini 2.0 Flash</span>
+  </header>
+
+  <div class="messages" id="messages">
+    <div class="empty-state" id="empty-state">
+      <div class="big-icon">🤖</div>
+      <h2>Hola, Marcos</h2>
+      <p>Tu asistente personal está listo. Usa las acciones rápidas o escribe lo que necesites.</p>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-wrap">
+      <textarea
+        id="msg-input" rows="1"
+        placeholder="Escribe un mensaje…"
+      ></textarea>
+    </div>
+    <button class="send-btn" id="send-btn">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</main>
+
+<!-- ── Context modal ── -->
+<div class="modal-backdrop" id="ctx-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="ctx-modal-title">Añadir contexto</div>
+    <div class="modal-sub"   id="ctx-modal-sub">Añade un nuevo dato a tu contexto personal.</div>
+    <input    id="ctx-clave" class="modal-field" placeholder="clave (ej: ciudad_trabajo)" autocomplete="off" />
+    <textarea id="ctx-valor" class="modal-field" placeholder="valor" rows="3"></textarea>
+    <div class="modal-footer">
+      <button class="btn btn-ghost"   id="ctx-modal-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="ctx-modal-save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

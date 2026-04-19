@@ -1,0 +1,29 @@
+# Environment & secrets
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Database (local state — not portable)
+*.db
+*.sqlite3
+
+# Google OAuth credentials & tokens — contain personal secrets
+credentials.json
+token.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# macOS
+.DS_Store
