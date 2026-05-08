@@ -201,6 +201,161 @@ async def update_returns(*, max_per_run: int = 50) -> dict:
     return {"updated_30d": updated_30, "updated_90d": updated_90}
 
 
+_BENCHMARK_TICKER = "SPY"
+
+
+def _benchmark_return(start_dt: datetime, end_dt: datetime) -> Optional[float]:
+    """Return SPY's % return between two dates. Synchronous; call via to_thread."""
+    try:
+        import yfinance as yf
+    except ImportError:
+        return None
+    try:
+        hist = yf.Ticker(_BENCHMARK_TICKER).history(
+            start=(start_dt - timedelta(days=5)).strftime("%Y-%m-%d"),
+            end=(end_dt + timedelta(days=5)).strftime("%Y-%m-%d"),
+            interval="1d",
+            auto_adjust=False,
+        )
+    except Exception as e:
+        log.warning("benchmark history failed: %s", e)
+        return None
+    if hist is None or hist.empty or "Close" not in hist.columns:
+        return None
+    closes = hist["Close"].dropna()
+    if closes.empty:
+        return None
+
+    def _on_or_after(d: datetime) -> Optional[float]:
+        try:
+            after = closes[closes.index.tz_localize(None) >= d.replace(tzinfo=None)]
+        except Exception:
+            after = closes[closes.index >= d]
+        return float(after.iloc[0]) if not after.empty else None
+
+    p_start = _on_or_after(start_dt) or float(closes.iloc[0])
+    p_end   = _on_or_after(end_dt) or float(closes.iloc[-1])
+    if p_start <= 0:
+        return None
+    return (p_end / p_start - 1.0) * 100.0
+
+
+async def alpha_vs_spy(*, recommendation: str = "COMPRAR",
+                       lookback_days: int = 365,
+                       window: int = 30) -> dict:
+    """Compare avg return of `recommendation` calls vs SPY in the same windows.
+
+    Skill-detection logic:
+      - Sample mean alpha = mean(stock_return - benchmark_return) per call
+      - One-sample t-test approximation (no scipy): t = mean / (std/sqrt(n))
+        We treat |t| ≥ 2 as 'evidence of skill'.
+      - alpha < 0 with n ≥ 30 → flag NEEDS_RECALIBRATION.
+    """
+    await init_predictions_table()
+    cutoff = (datetime.utcnow() - timedelta(days=lookback_days)).isoformat()
+
+    return_col = "return_30d_pct" if window == 30 else "return_90d_pct"
+
+    async with aiosqlite.connect(_DB_PATH) as db:
+        async with db.execute(
+            f"""
+            SELECT alert_date, ticker, alert_price, {return_col}
+            FROM predictions
+            WHERE recommendation = ? AND alert_date >= ? AND {return_col} IS NOT NULL
+            """,
+            (recommendation, cutoff),
+        ) as cur:
+            rows = await cur.fetchall()
+
+    if not rows:
+        return {
+            "n":             0,
+            "avg_stock":     None,
+            "avg_benchmark": None,
+            "avg_alpha":     None,
+            "alpha_std":     None,
+            "t_stat":        None,
+            "needs_recalibration": False,
+            "skill_evidence": False,
+            "window":        window,
+        }
+
+    alphas: list[float] = []
+    stock_returns: list[float] = []
+    bench_returns: list[float] = []
+    for alert_date_s, ticker, alert_price, ret in rows:
+        try:
+            alert_dt = datetime.fromisoformat(alert_date_s)
+        except (TypeError, ValueError):
+            continue
+        target_dt = alert_dt + timedelta(days=window)
+        bench_ret = await asyncio.to_thread(_benchmark_return, alert_dt, target_dt)
+        if bench_ret is None:
+            continue
+        stock_ret = float(ret)
+        alpha = stock_ret - bench_ret
+        alphas.append(alpha)
+        stock_returns.append(stock_ret)
+        bench_returns.append(bench_ret)
+
+    if not alphas:
+        return {
+            "n":             0,
+            "avg_stock":     None,
+            "avg_benchmark": None,
+            "avg_alpha":     None,
+            "alpha_std":     None,
+            "t_stat":        None,
+            "needs_recalibration": False,
+            "skill_evidence": False,
+            "window":        window,
+        }
+
+    n = len(alphas)
+    mean_alpha = sum(alphas) / n
+    mean_stock = sum(stock_returns) / n
+    mean_bench = sum(bench_returns) / n
+    variance = sum((x - mean_alpha) ** 2 for x in alphas) / max(1, n - 1)
+    std = variance ** 0.5
+    t_stat = (mean_alpha / (std / (n ** 0.5))) if std > 0 and n > 1 else None
+
+    needs_recal = (n >= 30 and recommendation == "COMPRAR" and mean_alpha < 0)
+    skill = (t_stat is not None and abs(t_stat) >= 2.0)
+
+    return {
+        "n":              n,
+        "window":         window,
+        "avg_stock":      mean_stock,
+        "avg_benchmark":  mean_bench,
+        "avg_alpha":      mean_alpha,
+        "alpha_std":      std,
+        "t_stat":         t_stat,
+        "skill_evidence": skill,
+        "needs_recalibration": needs_recal,
+    }
+
+
+def format_alpha_line(alpha: dict) -> str:
+    """One-line description of alpha vs benchmark."""
+    n = alpha.get("n") or 0
+    if n == 0:
+        return "Alpha vs SPY: muestra insuficiente"
+    a = alpha.get("avg_alpha")
+    b = alpha.get("avg_benchmark")
+    s = alpha.get("avg_stock")
+    t = alpha.get("t_stat")
+    parts = [
+        f"Alpha {alpha.get('window', 30)}d: {a:+.2f}pp (n={n}, modelo {s:+.2f}% vs SPY {b:+.2f}%)"
+    ]
+    if isinstance(t, (int, float)):
+        parts.append(f"t={t:+.2f}")
+    if alpha.get("skill_evidence"):
+        parts.append("✅ skill significativo")
+    if alpha.get("needs_recalibration"):
+        parts.append("⚠️ RECALIBRAR")
+    return " | ".join(parts)
+
+
 async def model_accuracy(*, recommendation: str = "COMPRAR",
                          lookback_days: int = 365) -> dict:
     """Precision of the model: % of `recommendation` calls whose return beat the threshold.

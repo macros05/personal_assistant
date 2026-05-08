@@ -17,6 +17,12 @@ from modules import stock_news
 from modules import macro_context, momentum as momentum_mod, quality as quality_mod
 from modules import early_warning as early_warning_mod
 from modules import predictions as predictions_mod
+from modules import competitors as competitors_mod
+from modules import business_cycle as cycle_mod
+from modules import catalysts as catalysts_mod
+from modules import data_sources as data_sources_mod
+from modules import options_signal as options_mod
+from modules import watchlist as watchlist_mod
 
 log = logging.getLogger("modules.stock_analyzer")
 
@@ -112,6 +118,21 @@ Métricas de calidad de negocio:
 Señales de alerta temprana:
 {early_warning_block}
 
+Comparativa con peers (auto-descubierta):
+{competitors_block}
+
+Tipo de negocio y fase macro:
+{cycle_block}
+
+Catalizadores próximos:
+{catalysts_block}
+
+Señales de opciones (IV / put-call):
+{options_block}
+
+Calidad de datos cruzados (yf vs AV vs Finviz):
+{data_quality_block}
+
 Estimación inicial (ancla, NO definitiva) DCF EPS×{dcf_multiplier}: {dcf_baseline}
 Graham number (referencia, solo si EPS y BookValue > 0): {graham}
 
@@ -135,21 +156,8 @@ _TICKER_DISAMBIGUATION: dict[str, str] = {
 
 
 def load_watchlist() -> list[dict]:
-    """Read watchlist.json and return a flat list of {ticker, name, region}."""
-    try:
-        raw = json.loads(_WATCHLIST_PATH.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as e:
-        log.error("Cannot read watchlist: %s", e)
-        return []
-
-    items: list[dict] = []
-    for region in ("us", "eu"):
-        for entry in raw.get(region, []) or []:
-            ticker = entry.get("ticker")
-            name   = entry.get("name") or ticker
-            if ticker:
-                items.append({"ticker": ticker, "name": name, "region": region})
-    return items
+    """Read watchlist.json via the dynamic-watchlist module."""
+    return watchlist_mod.list_tickers()
 
 
 def _safe(v):
@@ -341,6 +349,12 @@ def _build_prompt(
     momentum: dict,
     quality: dict,
     early_warning: dict,
+    competitors: dict,
+    cycle: dict,
+    catalysts: dict,
+    options: dict,
+    data_cross: dict,
+    finviz: dict,
 ) -> tuple[str, str, Optional[float], Optional[float], float]:
     eps         = fund.get("eps")
     book_value  = fund.get("book_value")
@@ -384,6 +398,11 @@ def _build_prompt(
         momentum_block=momentum_mod.format_momentum_block(momentum),
         quality_block=quality_mod.format_quality_block(quality),
         early_warning_block=early_warning_mod.format_early_warning_block(early_warning),
+        competitors_block=competitors_mod.format_competitors_block(competitors),
+        cycle_block=cycle_mod.format_cycle_block(cycle),
+        catalysts_block=catalysts_mod.format_catalysts_block(catalysts),
+        options_block=options_mod.format_options_block(options),
+        data_quality_block=data_sources_mod.format_data_quality_block(data_cross, finviz),
         dcf_multiplier=f"{multiplier:.0f}",
         dcf_baseline=(f"{dcf_baseline:.2f}" if dcf_baseline is not None else "N/A"),
         graham=(f"{graham:.2f}" if graham is not None else "N/A"),
@@ -524,8 +543,11 @@ def _reconcile_confidence(verdict: dict, data_quality: str) -> dict:
 _HARD_CAPS = {
     "ROIC_BELOW_WACC":          50,
     "HIGH_LEVERAGE":            55,
+    "DEBT_STRESS":              50,
     "MOMENTUM_DIVERGENCE":      60,
     "PRICED_FOR_PERFECTION":    65,
+    "PREMIUM_VS_PEERS":         70,
+    "DATA_DISCREPANCY":         70,
 }
 
 # Additive penalties from early-warning signals. HIGH_SHORT_INTEREST is context-only.
@@ -534,33 +556,69 @@ _ADDITIVE_PENALTIES = {
     "GUIDANCE_CUT":             20,
     "MARGIN_DETERIORATION":      8,
     "NEGATIVE_FCF":              5,
+    "FLOATING_DEBT_RISK":        5,
+    "SHAREHOLDER_DILUTION":     10,
+    "CYCLICAL_VS_DOWN_PHASE":    6,
+    "PUT_CALL_BEARISH":          4,
+}
+
+# Bonuses (negative penalty). Recognise positive signals so the score can lift
+# meaningfully when several reinforce each other.
+_ADDITIVE_BONUSES = {
+    "RELATIVE_VALUE_OPPORTUNITY": 8,
+    "SHARE_BUYBACK":              5,
+    "DEFENSIVE_TAILWIND":         4,
+    "CYCLICAL_TAILWIND":          4,
+    "EARNINGS_NEAR":              2,
+    "EARNINGS_IMMINENT":          0,    # imminent earnings cuts both ways → neutral
+    "HARD_CATALYST":              4,
+    "PUT_CALL_BULLISH":           2,
 }
 
 
 def _apply_advanced_scoring(verdict: dict, *, momentum: dict, quality: dict,
-                            early_warning: dict, fund: dict) -> dict:
+                            early_warning: dict, fund: dict,
+                            competitors: Optional[dict] = None,
+                            cycle: Optional[dict] = None,
+                            catalysts: Optional[dict] = None,
+                            options: Optional[dict] = None,
+                            data_cross: Optional[dict] = None) -> dict:
     """Combine LLM score with quantitative signals; apply additive + hard-cap rules.
 
-    Rules (matching CLAUDE-spec):
+    Rules:
       - Start with LLM score.
-      - Subtract additive penalties (insider selling, guidance cuts, margin trend, FCF).
-      - Apply the lowest of any hard caps in {ROIC<WACC, high leverage, momentum
-        divergence, priced for perfection}.
-      - A score >= 80 therefore requires NONE of the cap flags to fire.
-      - Recommendation downgrades: COMPRAR → ESPERAR if any hard cap fires; ESPERAR →
-        EVITAR if ROIC < WACC AND high leverage both fire (clear value destroyer).
+      - Subtract additive penalties (insider selling, guidance cuts, margin
+        trend, FCF, dilution, floating debt, cyclical-against-cycle).
+      - Add additive bonuses (relative-value vs peers, buybacks, defensive
+        tailwind, hard catalyst).
+      - Apply phase_fit_score (cycle module) as a small additive adjustment.
+      - Apply the lowest of any hard caps in {ROIC<WACC, high leverage,
+        DEBT_STRESS, momentum divergence, priced for perfection,
+        PREMIUM_VS_PEERS, DATA_DISCREPANCY}.
+      - A score ≥80 therefore requires NONE of the cap flags to fire.
+      - Recommendation downgrades:
+        • COMPRAR → ESPERAR if any hard cap fires.
+        • ESPERAR → EVITAR if (ROIC<WACC AND HIGH_LEVERAGE) or DEBT_STRESS+
+          GUIDANCE_CUT both fire (clear value destroyer / fragile under stress).
+        • DATA_DISCREPANCY ALSO drops confidence one notch.
     """
     score = int(verdict.get("score", 0) or 0)
     flags: list[str] = list(verdict.get("flags", []) or [])
 
-    # Pull flags from each signal source, deduped.
-    for src in (momentum, quality, early_warning):
+    # Pull flags from every signal source, deduped.
+    for src in (momentum, quality, early_warning, competitors, cycle, catalysts,
+                options, data_cross):
+        if not src:
+            continue
         for f in (src.get("flags") or []):
             if f not in flags:
                 flags.append(f)
 
     additive_penalty = sum(_ADDITIVE_PENALTIES.get(f, 0) for f in flags)
-    score = max(0, score - additive_penalty)
+    additive_bonus   = sum(_ADDITIVE_BONUSES.get(f, 0) for f in flags)
+    phase_adj        = int((cycle or {}).get("phase_fit") or 0)
+
+    score = max(0, score - additive_penalty + additive_bonus + phase_adj)
 
     cap_flags = [f for f in flags if f in _HARD_CAPS]
     if cap_flags:
@@ -575,9 +633,19 @@ def _apply_advanced_scoring(verdict: dict, *, momentum: dict, quality: dict,
         rec = "ESPERAR"
         opportunity = False
 
+    # Strong-downgrade rules: when two destructive flags coincide we drop to EVITAR.
     if "ROIC_BELOW_WACC" in flags and "HIGH_LEVERAGE" in flags and rec == "ESPERAR":
         rec = "EVITAR"
         opportunity = False
+    if "DEBT_STRESS" in flags and "GUIDANCE_CUT" in flags and rec == "ESPERAR":
+        rec = "EVITAR"
+        opportunity = False
+
+    # DATA_DISCREPANCY also drops confidence one notch — even if the verdict
+    # survives the score cap.
+    if "DATA_DISCREPANCY" in flags:
+        rank = _CONFIDENCE_RANK.get(verdict.get("confidence", "LOW"), 0)
+        verdict["confidence"] = _CONFIDENCE_BY_RANK[max(0, rank - 1)]
 
     score = max(0, min(100, score))
 
@@ -587,6 +655,8 @@ def _apply_advanced_scoring(verdict: dict, *, momentum: dict, quality: dict,
     verdict["flags"]          = flags
     verdict["scoring_detail"] = {
         "additive_penalty":   additive_penalty,
+        "additive_bonus":     additive_bonus,
+        "phase_adj":          phase_adj,
         "hard_caps_applied":  cap_flags,
         "final_cap":          min((_HARD_CAPS[f] for f in cap_flags), default=None),
     }
@@ -640,8 +710,9 @@ async def analyze_company(
         if macro is None:
             macro = await macro_context.fetch_macro_context(client=http_client)
 
-        alpha = await _alpha_overview(http_client, ticker)
-        fund = _merge_alpha(fund, alpha)
+        alpha   = await _alpha_overview(http_client, ticker)
+        finviz  = await data_sources_mod.fetch_finviz(ticker, client=http_client)
+        fund    = _merge_alpha(fund, alpha)
 
         try:
             headlines = await stock_news.fetch_news(
@@ -666,6 +737,13 @@ async def analyze_company(
         early_warning = await asyncio.to_thread(
             early_warning_mod.compute_early_warnings, ticker, news_180h,
         )
+        competitors = await asyncio.to_thread(
+            competitors_mod.compute_competitor_comparison, ticker, fund, quality=quality,
+        )
+        cycle      = cycle_mod.evaluate(ticker, fund, macro)
+        catalysts_ = catalysts_mod.detect_catalysts(ticker, news_180h)
+        options_   = await asyncio.to_thread(options_mod.compute_options_signal, ticker)
+        data_cross = data_sources_mod.cross_validate(fund, alpha, finviz)
 
         # Tag MOMENTUM_DIVERGENCE / PRICED_FOR_PERFECTION using fundamentals signal.
         momentum["flags"] = momentum_mod.classify_momentum_flags(
@@ -675,6 +753,8 @@ async def analyze_company(
         prompt, sentiment, dcf_baseline, graham, multiplier = _build_prompt(
             name, ticker, fund, headlines,
             macro=macro, momentum=momentum, quality=quality, early_warning=early_warning,
+            competitors=competitors, cycle=cycle, catalysts=catalysts_,
+            options=options_, data_cross=data_cross, finviz=finviz,
         )
         raw = await _ask_gemini(prompt, gemini_client, gemini_model)
         if raw is None:
@@ -689,6 +769,8 @@ async def analyze_company(
         verdict = _apply_advanced_scoring(
             verdict, momentum=momentum, quality=quality,
             early_warning=early_warning, fund=fund,
+            competitors=competitors, cycle=cycle, catalysts=catalysts_,
+            options=options_, data_cross=data_cross,
         )
 
         catalyst = headlines[0]["title"] if headlines else ""
@@ -720,6 +802,12 @@ async def analyze_company(
             "momentum":          momentum,
             "quality":           quality,
             "early_warning":     early_warning,
+            "competitors":       competitors,
+            "cycle":             cycle,
+            "catalysts":         catalysts_,
+            "options":           options_,
+            "data_cross":        data_cross,
+            "finviz":            finviz,
             "headlines":         headlines,
             "analyzed_at":       datetime.utcnow().isoformat(),
             "raw_payload":       json.dumps(raw, ensure_ascii=False),

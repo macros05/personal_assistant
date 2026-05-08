@@ -19,8 +19,9 @@ from dotenv import load_dotenv  # noqa: E402
 load_dotenv(ROOT / ".env")
 
 from modules import (  # noqa: E402
-    stock_alerts, stock_analyzer, macro_context, predictions,
+    stock_alerts, stock_analyzer, macro_context, predictions, watchlist,
 )
+from scripts import stock_backtest  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,
@@ -96,7 +97,10 @@ async def _flag_changes_last_week() -> list[str]:
 
 
 def _format_digest(top3: list[dict], macro: dict, accuracy: dict,
-                   flag_changes: list[str]) -> str:
+                   flag_changes: list[str], *,
+                   alpha: dict | None = None,
+                   backtest_summary: dict | None = None,
+                   watchlist_changes: dict | None = None) -> str:
     lines = ["🗓️ RESUMEN SEMANAL — ASISTENTE DE BOLSA", ""]
     lines.append("📈 Top 3 watchlist (por puntuación más reciente):")
     if not top3:
@@ -121,7 +125,17 @@ def _format_digest(top3: list[dict], macro: dict, accuracy: dict,
         lines.append(f"  Retorno medio 30d: {accuracy['avg_return_30d_pct']:+.1f}%")
     if isinstance(accuracy.get("avg_return_90d_pct"), (int, float)):
         lines.append(f"  Retorno medio 90d: {accuracy['avg_return_90d_pct']:+.1f}%")
+    if alpha is not None:
+        lines.append("  " + predictions.format_alpha_line(alpha))
     lines.append("")
+
+    if backtest_summary is not None and backtest_summary.get("total", 0) > 0:
+        lines.append(stock_backtest.render_summary(backtest_summary))
+        lines.append("")
+
+    if watchlist_changes is not None:
+        lines.append(watchlist.format_evolve_summary(watchlist_changes))
+        lines.append("")
 
     if flag_changes:
         lines.append("⚑ Cambios de flags en empresas ya alertadas (últimos 7d):")
@@ -143,8 +157,27 @@ async def main() -> int:
     top3 = (await _latest_per_ticker())[:3]
     accuracy = await predictions.model_accuracy()
     flag_changes = await _flag_changes_last_week()
+    try:
+        alpha = await predictions.alpha_vs_spy(window=30)
+    except Exception as e:
+        log.warning("alpha_vs_spy failed: %s", e)
+        alpha = None
+    try:
+        backtest_summary = await stock_backtest.run(window=30)
+    except Exception as e:
+        log.warning("backtest failed: %s", e)
+        backtest_summary = None
+    try:
+        watchlist_changes = await watchlist.auto_evolve()
+    except Exception as e:
+        log.warning("watchlist auto_evolve failed: %s", e)
+        watchlist_changes = None
 
-    digest = _format_digest(top3, macro, accuracy, flag_changes)
+    digest = _format_digest(
+        top3, macro, accuracy, flag_changes,
+        alpha=alpha, backtest_summary=backtest_summary,
+        watchlist_changes=watchlist_changes,
+    )
     log.info("Digest:\n%s", digest)
     sent = await stock_alerts.send_telegram(digest)
     log.info("Weekly digest sent=%s", sent)

@@ -89,6 +89,11 @@ _PUBLIC_PREFIXES = (
     "/health",
     "/status",
     "/restart",
+    # /stock/* endpoints check the X-Restart-Key shared secret in-handler so
+    # seobot's Telegram commands can call them without holding a session
+    # cookie. Browser sessions are accepted via _is_authenticated() too.
+    "/stock/analyze",
+    "/stock/watchlist",
 )
 
 client = genai.Client(api_key=GEMINI_API_KEY)
@@ -707,6 +712,83 @@ load(); setInterval(load,30000);
 async def status_page():
     """Lightweight HTML dashboard pulling from /health every 30 s."""
     return HTMLResponse(_STATUS_HTML)
+
+
+# ── Stock analysis endpoints (called by /analiza, /watchlist Telegram cmds) ──
+
+@app.post("/stock/analyze")
+async def stock_analyze(request: Request):
+    """One-off analysis for a ticker. Body: {"ticker":"NVDA","name":"Nvidia"}.
+
+    Internal endpoint — must carry the X-Restart-Key header (same shared
+    secret as /restart) so only the seobot container can hit it from the
+    Telegram bridge. Public access remains gated by the auth middleware via
+    cookies for the dashboard.
+    """
+    body = await request.json()
+    ticker = (body.get("ticker") or "").upper().strip()
+    name = (body.get("name") or ticker).strip()
+    if not ticker:
+        raise HTTPException(status_code=400, detail="ticker requerido")
+
+    # When the caller is seobot via shared secret, allow without session.
+    key = request.headers.get("x-restart-key", "")
+    is_internal = key and hmac.compare_digest(key, INTERNAL_RESTART_KEY)
+    if not is_internal and not _is_authenticated(request):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    from modules import stock_analyzer
+    gem_client, model = stock_analyzer.make_gemini_client()
+    try:
+        result = await stock_analyzer.analyze_company(
+            ticker, name, gemini_client=gem_client, gemini_model=model,
+        )
+    except Exception as e:
+        log.exception("stock analyze failed for %s", ticker)
+        raise HTTPException(status_code=500, detail=str(e))
+
+    if result is None:
+        raise HTTPException(status_code=502, detail=f"No se pudo analizar {ticker}")
+
+    # Persist for history but never auto-send Telegram alert from this endpoint.
+    from modules import stock_alerts
+    await stock_alerts.log_analysis(result)
+
+    summary = stock_alerts.format_alert(result, accuracy_line="", history_line="", alpha_line="")
+    return JSONResponse({
+        "ticker":         result["ticker"],
+        "score":          result["score"],
+        "recommendation": result["recommendation"],
+        "confidence":     result["confidence"],
+        "flags":          result["flags"],
+        "summary":        summary,
+    })
+
+
+@app.post("/stock/watchlist")
+async def stock_watchlist_action(request: Request):
+    """Add/remove a ticker on the watchlist. Body: {"action":"add","ticker":"NVDA"}."""
+    body = await request.json()
+    action = (body.get("action") or "").lower().strip()
+    ticker = (body.get("ticker") or "").upper().strip()
+    name = (body.get("name") or "").strip()
+
+    key = request.headers.get("x-restart-key", "")
+    is_internal = key and hmac.compare_digest(key, INTERNAL_RESTART_KEY)
+    if not is_internal and not _is_authenticated(request):
+        raise HTTPException(status_code=403, detail="forbidden")
+
+    if action not in ("add", "remove", "list"):
+        raise HTTPException(status_code=400, detail="action debe ser add|remove|list")
+
+    from modules import watchlist as watchlist_mod
+    if action == "list":
+        return {"watchlist": watchlist_mod.list_tickers()}
+    if action == "add":
+        if not ticker:
+            raise HTTPException(status_code=400, detail="ticker requerido")
+        return watchlist_mod.add_ticker(ticker, name=name or None)
+    return watchlist_mod.remove_ticker(ticker)
 
 
 @app.post("/restart")

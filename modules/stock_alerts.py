@@ -52,6 +52,13 @@ async def init_db() -> None:
             "data_quality TEXT",
             "intrinsic_method TEXT",
             "peer_context TEXT",
+            "cycle_phase TEXT",
+            "cyclicality TEXT",
+            "iv_hv_ratio REAL",
+            "put_call_oi REAL",
+            "next_earnings_date TEXT",
+            "interest_coverage REAL",
+            "share_change_pct REAL",
         ):
             try:
                 await db.execute(f"ALTER TABLE analyses ADD COLUMN {col_def}")
@@ -76,14 +83,22 @@ async def init_db() -> None:
 async def log_analysis(record: dict) -> None:
     """Persist an analysis result regardless of whether it triggered an alert."""
     await init_db()
+    cycle = record.get("cycle") or {}
+    options = record.get("options") or {}
+    catalysts = record.get("catalysts") or {}
+    quality = record.get("quality") or {}
+
     async with aiosqlite.connect(_DB_PATH) as db:
         await db.execute(
             """
             INSERT INTO analyses
                 (ticker, name, price, intrinsic_value, margin_of_safety,
                  score, opportunity, recommendation, reason, catalyst, raw_payload,
-                 confidence, flags, data_quality, intrinsic_method, peer_context)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 confidence, flags, data_quality, intrinsic_method, peer_context,
+                 cycle_phase, cyclicality, iv_hv_ratio, put_call_oi,
+                 next_earnings_date, interest_coverage, share_change_pct)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 record.get("ticker", ""),
@@ -102,6 +117,13 @@ async def log_analysis(record: dict) -> None:
                 record.get("data_quality", ""),
                 record.get("intrinsic_method", ""),
                 record.get("peer_context", ""),
+                cycle.get("phase"),
+                cycle.get("cyclicality"),
+                options.get("iv_hv_ratio"),
+                options.get("put_call_oi"),
+                catalysts.get("next_earnings_date"),
+                quality.get("interest_coverage"),
+                quality.get("share_change_pct"),
             ),
         )
         await db.commit()
@@ -120,6 +142,83 @@ async def already_alerted_recently(ticker: str, days: int = 7) -> bool:
     return row is not None
 
 
+async def previous_analysis(ticker: str, *, before_id: Optional[int] = None) -> Optional[dict]:
+    """Return the previous (or last) analysis for `ticker` BEFORE the current one.
+
+    Used to compute score/recommendation/price deltas in the alert footer.
+    """
+    await init_db()
+    async with aiosqlite.connect(_DB_PATH) as db:
+        if before_id is not None:
+            cur = await db.execute("""
+                SELECT id, score, recommendation, price, created_at
+                FROM analyses
+                WHERE ticker = ? AND id < ?
+                ORDER BY id DESC
+                LIMIT 1
+            """, (ticker, before_id))
+        else:
+            # Skip the most recent row (which is the one just inserted).
+            cur = await db.execute("""
+                SELECT id, score, recommendation, price, created_at
+                FROM analyses
+                WHERE ticker = ?
+                ORDER BY id DESC
+                LIMIT 1 OFFSET 1
+            """, (ticker,))
+        row = await cur.fetchone()
+        await cur.close()
+    if not row:
+        return None
+    return {
+        "id":             row[0],
+        "score":          row[1],
+        "recommendation": row[2],
+        "price":          row[3],
+        "created_at":     row[4],
+    }
+
+
+async def previous_alert(ticker: str) -> Optional[dict]:
+    """Return the latest already-sent alert (price + score) before now."""
+    await init_db()
+    async with aiosqlite.connect(_DB_PATH) as db:
+        cur = await db.execute("""
+            SELECT score, price, sent_at
+            FROM alerts_sent
+            WHERE ticker = ?
+            ORDER BY sent_at DESC
+            LIMIT 1
+        """, (ticker,))
+        row = await cur.fetchone()
+        await cur.close()
+    if not row:
+        return None
+    return {"score": row[0], "price": row[1], "sent_at": row[2]}
+
+
+def format_history_line(prev_analysis: Optional[dict], prev_alert_row: Optional[dict],
+                        *, current_score: int, current_rec: str,
+                        current_price: Optional[float]) -> str:
+    """1-line history footer: previous score, recommendation, and price drift."""
+    parts: list[str] = []
+    if prev_analysis:
+        prev_s = prev_analysis.get("score")
+        prev_r = prev_analysis.get("recommendation") or "?"
+        if isinstance(prev_s, int):
+            delta = current_score - prev_s
+            parts.append(f"prev. score {prev_s}→{current_score} ({delta:+d})")
+        if prev_r and prev_r.upper() != (current_rec or "").upper():
+            parts.append(f"rec {prev_r}→{current_rec}")
+    if prev_alert_row and isinstance(prev_alert_row.get("price"), (int, float)) \
+            and isinstance(current_price, (int, float)) and prev_alert_row["price"] > 0:
+        pct = (current_price / prev_alert_row["price"] - 1.0) * 100.0
+        parts.append(f"vs alerta previa: {pct:+.1f}% en precio")
+    if not parts:
+        return "Histórico: primera vez que esta empresa se acerca al umbral."
+    return "Histórico: " + " · ".join(parts)
+
+
 async def record_alert(ticker: str, score: int, price: Optional[float]) -> None:
     await init_db()
     async with aiosqlite.connect(_DB_PATH) as db:
@@ -130,7 +229,8 @@ async def record_alert(ticker: str, score: int, price: Optional[float]) -> None:
         await db.commit()
 
 
-def format_alert(analysis: dict, *, accuracy_line: str = "") -> str:
+def format_alert(analysis: dict, *, accuracy_line: str = "",
+                 history_line: str = "", alpha_line: str = "") -> str:
     """Build the Spanish Telegram message body. Marcos's exact format."""
     name           = analysis.get("name", "")
     ticker         = analysis.get("ticker", "")
@@ -188,7 +288,30 @@ def format_alert(analysis: dict, *, accuracy_line: str = "") -> str:
             quality_line += f", ROIC {fmt_pct(quality.get('roic'))} vs WACC {fmt_pct(quality.get('wacc'))}"
         quality_line += "\n"
 
+    cycle = analysis.get("cycle") or {}
+    catalysts_data = analysis.get("catalysts") or {}
+    options = analysis.get("options") or {}
+
+    cycle_line = ""
+    if cycle.get("available"):
+        cycle_line = (f"Ciclo: {cycle.get('cyclicality')} en fase "
+                      f"{cycle.get('phase')} (fit {cycle.get('phase_fit'):+d})\n")
+
+    catalyst_extra_line = ""
+    days_to_e = catalysts_data.get("days_to_earnings")
+    if isinstance(days_to_e, int) and 0 <= days_to_e <= 21:
+        catalyst_extra_line = f"Próximo earnings: en {days_to_e}d ({catalysts_data.get('next_earnings_date')})\n"
+
+    options_line = ""
+    if options.get("available") and options.get("iv_hv_ratio"):
+        options_line = (f"Opciones: IV/HV {options['iv_hv_ratio']:.2f} | "
+                        f"PCR(OI) {options.get('put_call_oi'):.2f}\n"
+                        if isinstance(options.get("put_call_oi"), (int, float))
+                        else f"Opciones: IV/HV {options['iv_hv_ratio']:.2f}\n")
+
+    history_footer = f"{history_line}\n" if history_line else ""
     accuracy_footer = f"{accuracy_line}\n" if accuracy_line else ""
+    alpha_footer    = f"{alpha_line}\n" if alpha_line else ""
 
     return (
         "📊 OPORTUNIDAD DETECTADA\n"
@@ -200,13 +323,18 @@ def format_alert(analysis: dict, *, accuracy_line: str = "") -> str:
         f"Recomendación: {recommendation}\n"
         f"{method_line}"
         f"{macro_line}"
+        f"{cycle_line}"
         f"{momentum_line}"
         f"{quality_line}"
+        f"{options_line}"
         f"Análisis: {reason}\n"
         f"{peer_line}"
         f"Catalizador: {catalyst}\n"
+        f"{catalyst_extra_line}"
         f"{flag_line}"
+        f"{history_footer}"
         f"{accuracy_footer}"
+        f"{alpha_footer}"
         f"{_DISCLAIMER}"
     )
 
@@ -269,7 +397,26 @@ async def maybe_alert(
 
     accuracy = await predictions_mod.model_accuracy()
     accuracy_line = predictions_mod.format_accuracy_line(accuracy)
-    if await send_telegram(format_alert(analysis, accuracy_line=accuracy_line)):
+    try:
+        alpha = await predictions_mod.alpha_vs_spy(window=30)
+        alpha_line = predictions_mod.format_alpha_line(alpha)
+    except Exception as e:
+        log.warning("alpha_vs_spy failed: %s", e)
+        alpha_line = ""
+    prev_a = await previous_analysis(ticker)
+    prev_al = await previous_alert(ticker)
+    history_line = format_history_line(
+        prev_a, prev_al, current_score=score, current_rec=analysis.get("recommendation", ""),
+        current_price=analysis.get("price"),
+    )
+
+    body = format_alert(
+        analysis,
+        accuracy_line=accuracy_line,
+        alpha_line=alpha_line,
+        history_line=history_line,
+    )
+    if await send_telegram(body):
         await record_alert(ticker, score, analysis.get("price"))
         await predictions_mod.record_prediction(analysis)
         log.info("Alert sent for %s (score=%d, margin=%.1f%%, conf=%s)",
