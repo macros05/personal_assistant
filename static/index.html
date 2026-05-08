@@ -2,97 +2,235 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Asistente Personal · Marcos</title>
+
+  <!-- Tailwind CSS CDN + shared theme config (see /static/js/tailwind-config.js) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/static/js/tailwind-config.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
   <link rel="stylesheet" href="/static/css/main.css" />
 </head>
-<body>
 
-<!-- ── Sidebar ── -->
-<aside class="sidebar">
-  <div class="sidebar-inner">
+<body class="bg-c-bg text-c-txt font-sans flex overflow-hidden antialiased" style="height:100dvh">
 
-    <div class="sidebar-brand">
-      <div class="brand-avatar">M</div>
+<!-- ── Mobile overlay ── -->
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+<!-- ────────────────────── SIDEBAR ────────────────────────── -->
+<aside id="sidebar"
+       class="sidebar bg-c-s1 border-r border-c-bdr flex flex-col overflow-hidden flex-shrink-0 w-sidebar min-w-sidebar">
+
+  <!-- Scrollable content -->
+  <div class="sidebar-inner flex-1 overflow-y-auto overflow-x-hidden p-3 flex flex-col gap-5">
+
+    <!-- Brand -->
+    <div class="flex items-center gap-3 px-1 pt-1 flex-shrink-0">
+      <div class="w-9 h-9 rounded-[10px] flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+           style="background:linear-gradient(135deg,var(--accent),var(--accent-violet));box-shadow:0 2px 14px rgba(91,141,238,.35)">M</div>
       <div>
-        <div class="brand-name">Marcos</div>
-        <div class="brand-sub">AI Automation Engineer</div>
+        <div class="text-sm font-semibold leading-tight tracking-tight text-c-txt">Marcos</div>
+        <div class="text-[11px] text-c-dim mt-0.5">AI Automation Engineer</div>
       </div>
     </div>
 
-    <!-- Quick actions -->
-    <div>
-      <div class="s-title" style="margin-bottom:8px">Acciones rápidas</div>
-      <div class="quick-actions">
-        <button class="qa-btn highlight" data-action="resumen">
-          <span class="icon">📋</span> Resumen del día
+    <!-- Quick actions — pill tags -->
+    <div class="flex flex-col gap-2">
+      <div class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut px-0.5">Acciones rápidas</div>
+      <div class="flex flex-wrap gap-1.5">
+        <button class="qa-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
+                       border bg-c-acc/10 border-c-acc/40 text-c-txt
+                       transition-all whitespace-nowrap min-h-[36px] active:scale-95"
+                data-action="resumen">
+          <span>📋</span> Resumen del día
         </button>
-        <button class="qa-btn" data-action="week">
-          <span class="icon">📅</span> Mi semana
+        <button class="qa-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim hover:border-c-acc/40 hover:text-c-txt
+                       transition-all whitespace-nowrap min-h-[36px] active:scale-95"
+                data-action="week">
+          <span>📅</span> Mi semana
         </button>
-        <button class="qa-btn" data-action="finances">
-          <span class="icon">💰</span> Mis finanzas
+        <button class="qa-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim hover:border-c-acc/40 hover:text-c-txt
+                       transition-all whitespace-nowrap min-h-[36px] active:scale-95"
+                data-action="finances">
+          <span>💰</span> Mis finanzas
         </button>
-        <button class="qa-btn" data-action="wroclaw">
-          <span class="icon">✈️</span> Días hasta Wrocław
+        <button class="qa-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim hover:border-c-acc/40 hover:text-c-txt
+                       transition-all whitespace-nowrap min-h-[36px] active:scale-95"
+                data-action="wroclaw">
+          <span>✈️</span> Wrocław
         </button>
-        <button class="qa-btn" data-action="focus">
-          <span class="icon">🎯</span> ¿En qué enfocarme?
+        <button class="qa-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim hover:border-c-acc/40 hover:text-c-txt
+                       transition-all whitespace-nowrap min-h-[36px] active:scale-95"
+                data-action="focus">
+          <span>🎯</span> ¿En qué enfocarme?
+        </button>
+        <button class="qa-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim hover:border-c-acc/40 hover:text-c-txt
+                       transition-all whitespace-nowrap min-h-[36px] active:scale-95"
+                data-action="trading">
+          <span>📈</span> Trading bot
         </button>
       </div>
     </div>
 
     <!-- Today's events -->
-    <div id="today-section" style="display:none">
-      <div class="s-title" style="margin-bottom:8px">Hoy</div>
+    <div class="flex flex-col gap-2" id="today-section" style="display:none">
+      <div class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut px-0.5">Hoy</div>
       <div class="today-list" id="today-list">
-        <div class="today-empty">Cargando…</div>
+        <div class="skeleton skeleton-block"></div>
       </div>
     </div>
 
     <!-- Flight tracker -->
-    <div>
-      <div class="s-title" style="margin-bottom:8px">Próximo vuelo AGP → WRO</div>
+    <div class="flex flex-col gap-2">
+      <div class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut px-0.5">Próximo vuelo AGP → WRO</div>
       <div id="flight-panel">
-        <div class="flight-card"><div class="flight-loading">Buscando vuelos…</div></div>
+        <div class="flight-card">
+          <div class="skeleton skeleton-line w-1-2"></div>
+          <div class="skeleton skeleton-line w-3-4"></div>
+          <div class="skeleton skeleton-line w-1-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tracked flights (Melanie) -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between px-0.5">
+        <span class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut">Vuelos de Melanie</span>
+        <button id="fl-refresh-btn" title="Actualizar estados"
+                class="w-7 h-7 flex items-center justify-center rounded-md text-base leading-none
+                       bg-c-s2 border border-c-bdr text-c-dim
+                       hover:border-c-acc hover:text-c-acc hover:bg-[rgba(91,141,238,.12)]
+                       transition-all flex-shrink-0">↻</button>
+      </div>
+      <div id="tracked-flights-panel">
+        <div class="skeleton skeleton-block"></div>
+      </div>
+    </div>
+
+    <!-- Trading Bot -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between px-0.5">
+        <span class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut">Trading Bot · BTC/USDT</span>
+        <button id="tb-refresh-btn" title="Actualizar estado"
+                class="w-7 h-7 flex items-center justify-center rounded-md text-base leading-none
+                       bg-c-s2 border border-c-bdr text-c-dim
+                       hover:border-c-acc hover:text-c-acc hover:bg-[rgba(91,141,238,.12)]
+                       transition-all flex-shrink-0">↻</button>
+      </div>
+      <div id="trading-bot-panel">
+        <div class="skeleton skeleton-block"></div>
+      </div>
+    </div>
+
+    <!-- SEO Bot -->
+    <div class="flex flex-col gap-2">
+      <div class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut px-0.5">SEO Bot</div>
+      <div class="flex flex-col gap-1">
+        <button id="seo-audit-btn"
+                class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim
+                       hover:border-c-acc/40 hover:text-c-txt
+                       transition-all min-h-[36px] active:scale-95">
+          <span>🔍</span> Nueva Auditoría
+        </button>
+        <button id="seo-campaign-btn"
+                class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim
+                       hover:border-c-acc/40 hover:text-c-txt
+                       transition-all min-h-[36px] active:scale-95">
+          <span>🚀</span> Nueva Campaña
+        </button>
+        <button id="seo-status-btn"
+                class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim
+                       hover:border-c-acc/40 hover:text-c-txt
+                       transition-all min-h-[36px] active:scale-95">
+          <span>📊</span> Estado Campaña
+        </button>
+        <button id="seo-prospects-btn"
+                class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium
+                       border border-c-bdr bg-c-s2 text-c-dim
+                       hover:border-c-acc/40 hover:text-c-txt
+                       transition-all min-h-[36px] active:scale-95">
+          <span>📋</span> Prospectos
+        </button>
       </div>
     </div>
 
     <!-- Google Calendar -->
-    <div>
-      <div class="s-title" style="margin-bottom:8px">Google Calendar</div>
-      <div id="cal-status-panel"><div class="cal-notice">Cargando…</div></div>
+    <div class="flex flex-col gap-2">
+      <div class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut px-0.5">Google Calendar</div>
+      <div id="cal-status-panel">
+        <div class="skeleton skeleton-block"></div>
+      </div>
     </div>
 
     <!-- Personal context -->
-    <div>
-      <div class="ctx-section-header" style="margin-bottom:8px">
-        <span class="s-title">Contexto Personal</span>
-        <button class="ctx-add-btn" id="ctx-add-btn" title="Añadir clave">+</button>
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between px-0.5">
+        <span class="text-[10px] font-semibold uppercase tracking-[.09em] text-c-mut">Contexto Personal</span>
+        <button id="ctx-add-btn" title="Añadir clave"
+                class="w-7 h-7 flex items-center justify-center rounded-md text-lg leading-none
+                       bg-c-s2 border border-c-bdr text-c-dim
+                       hover:border-c-acc hover:text-c-acc hover:bg-[rgba(91,141,238,.12)]
+                       transition-all flex-shrink-0">+</button>
       </div>
       <div class="ctx-list" id="ctx-list">
-        <div class="ctx-empty">Cargando…</div>
+        <div class="skeleton skeleton-block"></div>
+        <div class="skeleton skeleton-block"></div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /sidebar-inner -->
 
-  <div class="sidebar-footer">
-    <button class="sidebar-action danger" id="clear-history-btn">
+  <!-- Footer actions -->
+  <div class="p-3 border-t border-c-bdr flex-shrink-0 flex flex-col gap-0.5">
+    <button id="clear-history-btn"
+            class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs text-c-dim
+                   hover:bg-c-s2 hover:text-c-red/80 transition-all min-h-[40px]">
       <span>🗑️</span> Borrar historial
     </button>
+    <a href="/logout"
+       class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-xs text-c-dim
+              hover:bg-c-s2 hover:text-c-txt transition-all min-h-[40px]">
+      <span>🚪</span> Cerrar sesión
+    </a>
   </div>
 </aside>
 
-<!-- ── Main ── -->
-<main class="main">
-  <header class="chat-header">
-    <div class="status-dot"></div>
-    <span class="chat-header-title">Asistente Personal</span>
-    <span class="chat-header-sub">Gemini 2.0 Flash</span>
+<!-- ─────────────────────── MAIN ───────────────────────────── -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+  <!-- Header -->
+  <header class="flex-shrink-0 h-14 px-4 bg-c-s1 border-b border-c-bdr flex items-center gap-2.5">
+    <button id="sidebar-toggle" aria-label="Abrir menú"
+            class="w-10 h-10 flex items-center justify-center rounded-lg text-c-dim
+                   hover:bg-c-s2 hover:text-c-txt transition-all flex-shrink-0">
+      <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current pointer-events-none">
+        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+      </svg>
+    </button>
+
+    <div class="w-2 h-2 rounded-full bg-c-grn flex-shrink-0 status-dot"></div>
+    <span class="text-[15px] font-semibold tracking-tight">Asistente Personal</span>
+    <span class="text-xs text-c-dim ml-auto">Gemini 2.5 Flash</span>
   </header>
 
-  <div class="messages" id="messages">
+  <!-- Chat area (hidden when SEO panel is active) -->
+  <div id="chat-area" class="flex-1 flex flex-col overflow-hidden">
+
+  <!-- Messages -->
+  <div id="messages"
+       class="messages flex-1 overflow-y-auto overflow-x-hidden flex flex-col gap-0.5
+              px-4 pt-5 pb-2 sm:px-6">
     <div class="empty-state" id="empty-state">
       <div class="big-icon">🤖</div>
       <h2>Hola, Marcos</h2>
@@ -100,33 +238,193 @@
     </div>
   </div>
 
-  <div class="input-bar">
-    <div class="input-wrap">
+  <!-- Input bar -->
+  <div class="flex-shrink-0 bg-c-s1 border-t border-c-bdr px-4 pt-3 flex gap-2 items-end sm:px-6"
+       style="padding-bottom:max(12px,env(safe-area-inset-bottom))">
+
+    <div class="flex-1 bg-c-s2 border border-c-bdr rounded-xl flex items-end px-3.5 py-2.5
+                transition-all focus-within:border-c-accd focus-within:[box-shadow:0_0_0_3px_rgba(91,141,238,.15)]
+                min-h-[48px]">
       <textarea
         id="msg-input" rows="1"
+        class="flex-1 bg-transparent border-none outline-none text-c-txt font-sans text-[15px]
+               resize-none max-h-40 min-h-6 leading-[1.55] placeholder:text-c-mut"
         placeholder="Escribe un mensaje…"
+        aria-label="Mensaje"
       ></textarea>
     </div>
-    <button class="send-btn" id="send-btn">
-      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+
+    <button id="send-btn" aria-label="Enviar"
+            class="w-12 h-12 bg-c-acc rounded-xl flex items-center justify-center flex-shrink-0
+                   transition-all hover:bg-c-accd active:scale-90
+                   disabled:bg-c-bdr disabled:cursor-not-allowed"
+            style="box-shadow:0 2px 12px rgba(91,141,238,.3)">
+      <svg viewBox="0 0 24 24" class="w-5 h-5 fill-white">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
     </button>
   </div>
+
+  </div><!-- /chat-area -->
+
+  <!-- ──────────────────── SEO PANEL ──────────────────────────── -->
+  <div id="seo-panel" class="flex-1 flex flex-col overflow-hidden" style="display:none">
+
+    <!-- SEO panel header (matches app header height) -->
+    <div class="flex-shrink-0 h-14 px-4 bg-c-s1 border-b border-c-bdr flex items-center gap-3 sm:px-6">
+      <span id="seo-panel-icon" class="text-lg leading-none flex-shrink-0">🔍</span>
+      <span id="seo-panel-title" class="text-[15px] font-semibold tracking-tight flex-1 truncate">SEO Bot</span>
+      <button id="seo-close-btn" title="Volver al chat" aria-label="Cerrar panel SEO"
+              class="w-10 h-10 flex items-center justify-center rounded-lg text-c-dim
+                     hover:bg-c-s2 hover:text-c-txt transition-all flex-shrink-0">✕</button>
+    </div>
+
+    <!-- ── Audit view ── -->
+    <div id="seo-audit-view" class="seo-view flex-1 overflow-y-auto" style="display:none">
+      <div class="p-5 sm:p-6 max-w-2xl flex flex-col gap-5">
+
+        <div class="flex flex-col gap-3">
+          <div>
+            <div class="seo-label">URL a auditar</div>
+            <input id="seo-url" type="url" class="seo-field"
+                   placeholder="https://ejemplo.com" autocomplete="off" />
+          </div>
+          <div>
+            <div class="seo-label">Nombre del negocio <span class="seo-label-opt">(opcional)</span></div>
+            <input id="seo-biz" type="text" class="seo-field"
+                   placeholder="Mi Negocio SL" autocomplete="off" />
+          </div>
+          <button id="seo-audit-submit" class="seo-btn">🔍 Auditar</button>
+        </div>
+
+        <!-- Audit results (shown after API response) -->
+        <div id="seo-audit-results" class="flex flex-col gap-5" style="display:none">
+          <div class="h-px bg-c-bdr"></div>
+          <div class="flex items-center gap-4">
+            <div id="seo-score-badge" class="seo-score-badge">--</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-semibold text-c-txt">Puntuación SEO</div>
+              <div id="seo-score-desc" class="text-xs text-c-dim mt-1">–</div>
+              <a id="seo-proposal-link" href="#" target="_blank" rel="noopener"
+                 class="inline-flex items-center gap-1 mt-2 text-xs font-medium text-c-acc hover:underline"
+                 style="display:none">Ver propuesta →</a>
+            </div>
+          </div>
+          <div>
+            <div class="text-[10px] font-semibold uppercase tracking-wider text-c-mut mb-2">Principales problemas</div>
+            <div id="seo-issues-list" class="flex flex-col gap-2"></div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /audit-view -->
+
+    <!-- ── Campaign view ── -->
+    <div id="seo-campaign-view" class="seo-view flex-1 overflow-y-auto" style="display:none">
+      <div class="p-5 sm:p-6 max-w-2xl flex flex-col gap-4">
+
+        <div class="flex flex-col gap-3">
+          <div>
+            <div class="seo-label">¿Qué tipo de negocio?</div>
+            <input id="seo-query" type="text" class="seo-field"
+                   placeholder="clínicas dentales, restaurantes…" />
+          </div>
+          <div>
+            <div class="seo-label">¿Dónde?</div>
+            <input id="seo-location" type="text" class="seo-field"
+                   placeholder="Málaga, España" />
+          </div>
+          <div>
+            <div class="seo-label" style="margin-bottom:8px">Tipo de negocio</div>
+            <div class="flex gap-2">
+              <button id="seo-type-local"  class="seo-toggle active" data-type="local">📍 Local</button>
+              <button id="seo-type-online" class="seo-toggle"        data-type="online">🌐 Online</button>
+            </div>
+          </div>
+          <div>
+            <div class="seo-label">
+              Límite: <span id="seo-limit-val" class="text-c-acc font-semibold">20</span> prospectos
+            </div>
+            <input id="seo-limit" type="range" min="10" max="50" value="20" class="seo-range" />
+          </div>
+          <label class="flex items-center gap-3 cursor-pointer min-h-[44px]">
+            <input id="seo-dryrun" type="checkbox" class="w-4 h-4 cursor-pointer"
+                   style="accent-color:var(--accent)" />
+            <span class="text-sm text-c-dim">Solo analizar, no enviar emails</span>
+          </label>
+          <button id="seo-campaign-submit" class="seo-btn">🚀 Lanzar Campaña</button>
+        </div>
+
+        <div id="seo-campaign-result" class="seo-campaign-result" style="display:none"></div>
+
+      </div>
+    </div><!-- /campaign-view -->
+
+    <!-- ── Status view ── -->
+    <div id="seo-status-view" class="seo-view flex-1 overflow-y-auto" style="display:none">
+      <div class="p-5 sm:p-6 max-w-2xl flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-semibold uppercase tracking-wider text-c-mut">Estado de la campaña</span>
+          <button id="seo-status-refresh"
+                  class="text-xs text-c-acc hover:underline min-h-[32px] px-2">↻ Actualizar</button>
+        </div>
+        <div id="seo-status-content">
+          <div class="skeleton skeleton-block"></div>
+          <div class="skeleton skeleton-block"></div>
+        </div>
+      </div>
+    </div><!-- /status-view -->
+
+    <!-- ── Prospects view ── -->
+    <div id="seo-prospects-view" class="seo-view flex-1 overflow-y-auto" style="display:none">
+      <div class="p-5 sm:p-6 max-w-3xl flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-semibold uppercase tracking-wider text-c-mut">Prospectos evaluados</span>
+          <button id="seo-prospects-refresh"
+                  class="text-xs text-c-acc hover:underline min-h-[32px] px-2">↻ Actualizar</button>
+        </div>
+        <div id="seo-prospects-content">
+          <div class="skeleton skeleton-block"></div>
+          <div class="skeleton skeleton-block"></div>
+          <div class="skeleton skeleton-block"></div>
+        </div>
+      </div>
+    </div><!-- /prospects-view -->
+
+  </div><!-- /seo-panel -->
+
 </main>
 
-<!-- ── Context modal ── -->
-<div class="modal-backdrop" id="ctx-modal">
-  <div class="modal-box">
-    <div class="modal-title" id="ctx-modal-title">Añadir contexto</div>
-    <div class="modal-sub"   id="ctx-modal-sub">Añade un nuevo dato a tu contexto personal.</div>
+<!-- ───────────────── CONTEXT MODAL ────────────────────────── -->
+<div id="ctx-modal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="bg-c-s1 border border-c-bdr rounded-2xl p-6 w-full max-w-sm flex flex-col gap-3.5
+              shadow-[0_24px_64px_rgba(0,0,0,.6)]"
+       style="animation:modalIn .2s cubic-bezier(0.4,0,0.2,1)">
+
+    <div>
+      <div id="ctx-modal-title" class="text-[15px] font-semibold tracking-tight">Añadir contexto</div>
+      <div id="ctx-modal-sub"   class="text-xs text-c-dim mt-1">Añade un nuevo dato a tu contexto personal.</div>
+    </div>
+
     <input    id="ctx-clave" class="modal-field" placeholder="clave (ej: ciudad_trabajo)" autocomplete="off" />
     <textarea id="ctx-valor" class="modal-field" placeholder="valor" rows="3"></textarea>
-    <div class="modal-footer">
-      <button class="btn btn-ghost"   id="ctx-modal-cancel">Cancelar</button>
-      <button class="btn btn-primary" id="ctx-modal-save">Guardar</button>
+
+    <div class="flex gap-2 justify-end mt-1">
+      <button id="ctx-modal-cancel"
+              class="px-4 py-2 min-h-[36px] rounded-lg text-xs font-medium
+                     border border-c-bdr text-c-dim
+                     hover:border-c-accd hover:text-c-txt transition-all">
+        Cancelar
+      </button>
+      <button id="ctx-modal-save"
+              class="px-4 py-2 min-h-[36px] rounded-lg text-xs font-medium
+                     bg-c-acc text-white hover:bg-c-accd transition-all">
+        Guardar
+      </button>
     </div>
   </div>
 </div>
 
-<script type="module" src="/static/js/app.js"></script>
+<script type="module" src="/static/js/app.js?v=4"></script>
 </body>
 </html>

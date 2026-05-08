@@ -61,6 +61,61 @@ export async function revokeCalendar() {
   return fetch('/auth/google', { method: 'DELETE' });
 }
 
+export async function getTrackedFlights() {
+  const res = await fetch('/flights');
+  return res.json();
+}
+
+export async function trackFlight(flight_number, date, person = 'pareja') {
+  return fetch('/flights/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ flight_number, date, person }),
+  });
+}
+
+export async function updateTrackedFlights() {
+  const res = await fetch('/flights/update');
+  return res.json();
+}
+
+export async function deleteTrackedFlight(id) {
+  return fetch(`/flights/${id}`, { method: 'DELETE' });
+}
+
+export async function getTradingStatus() {
+  const res = await fetch('/trading/status');
+  return res.json();
+}
+
+export async function seoAudit(url, business_name) {
+  const res = await fetch('/seo/audit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url, business_name }),
+  });
+  return res.json();
+}
+
+export async function seoLaunchCampaign(params) {
+  const res = await fetch('/seo/campaign', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  return res.json();
+}
+
+export async function getSeoStatus() {
+  const res = await fetch('/seo/status');
+  return res.json();
+}
+
+export async function getSeoProspects() {
+  const res = await fetch('/seo/prospects');
+  return res.json();
+}
+
 /**
  * Reads an SSE stream from `response` and writes text into `bubble`.
  * Calls `onScroll()` after each text/status update.

@@ -246,6 +246,101 @@ export function renderContexto(rows, onEdit, onDelete) {
   });
 }
 
+const _FL_STATUS_LABEL = {
+  SCHEDULED: 'PROGRAMADO',
+  ACTIVE:    'EN RUTA',
+  LANDED:    'ATERRIZADO',
+  DELAYED:   'RETRASADO',
+  CANCELLED: 'CANCELADO',
+};
+
+/** Renders the tracked flights panel (Melanie's flights). */
+export function renderTrackedFlights(flights, onDelete) {
+  const panel = document.getElementById('tracked-flights-panel');
+  if (!flights || !flights.length) {
+    panel.innerHTML = '<div class="fl-empty">Sin vuelos en seguimiento.<br><span style="font-size:10px">Dile al asistente "Registra el vuelo FR1234 del 2026-05-20"</span></div>';
+    return;
+  }
+  panel.innerHTML = '';
+  flights.forEach(f => {
+    const card       = document.createElement('div');
+    card.className   = 'fl-tracked-card';
+    const statusKey  = (f.status || 'SCHEDULED').toUpperCase();
+    const label      = _FL_STATUS_LABEL[statusKey] || statusKey;
+    const cls        = statusKey.toLowerCase();
+    const route      = f.origin && f.destination ? `${escapeHtml(f.origin)} → ${escapeHtml(f.destination)}` : '';
+    const depRaw     = f.actual_departure   || f.scheduled_departure || '';
+    const arrRaw     = f.actual_arrival     || f.scheduled_arrival   || '';
+    const depTime    = depRaw.length >= 16 ? depRaw.slice(11, 16) : '';
+    const arrTime    = arrRaw.length >= 16 ? arrRaw.slice(11, 16) : '';
+    const timeLine   = depTime || arrTime
+      ? `<div class="fl-tracked-times">${depTime ? 'Salida ' + depTime : ''}${depTime && arrTime ? ' · ' : ''}${arrTime ? 'Llegada ' + arrTime : ''}</div>`
+      : '';
+
+    card.innerHTML = `
+      <div class="fl-tracked-header">
+        <span class="fl-tracked-num">${escapeHtml(f.flight_number)}</span>
+        <span class="fl-badge ${cls}">${label}</span>
+        <button class="fl-del-btn" title="Dejar de seguir" data-id="${f.id}">×</button>
+      </div>
+      ${route ? `<div class="fl-tracked-route">${route}</div>` : ''}
+      <div class="fl-tracked-meta">
+        <span>${escapeHtml(f.person)}</span>
+        <span>${escapeHtml(formatFlightDate(f.date))}</span>
+      </div>
+      ${timeLine}
+    `;
+    card.querySelector('.fl-del-btn').addEventListener('click', () => onDelete(f.id));
+    panel.appendChild(card);
+  });
+}
+
+/** Renders the trading bot status panel in the sidebar. */
+export function renderTradingBot(data) {
+  const panel = document.getElementById('trading-bot-panel');
+  if (!panel) return;
+
+  const stateLabels = {
+    WAITING_SIGNAL: 'Esperando señal',
+    IN_POSITION:    'En posición',
+    UNKNOWN:        'Desconocido',
+  };
+  const stateClass = {
+    WAITING_SIGNAL: 'tb-waiting',
+    IN_POSITION:    'tb-active',
+    UNKNOWN:        'tb-unknown',
+  };
+
+  const state       = data.state || 'UNKNOWN';
+  const label       = stateLabels[state] || state;
+  const cls         = stateClass[state]  || 'tb-unknown';
+  const balance     = data.balance_usdt  != null ? `$${data.balance_usdt.toLocaleString('es-ES', {minimumFractionDigits: 2})}` : '—';
+  const pnlVal      = data.total_pnl_usdt ?? 0;
+  const pnlSign     = pnlVal >= 0 ? '+' : '';
+  const pnlClass    = pnlVal >= 0 ? 'tb-pnl-pos' : 'tb-pnl-neg';
+  const wr          = data.win_rate_pct  != null ? `${data.win_rate_pct}%` : '—';
+  const trades      = data.total_trades  != null ? data.total_trades : '—';
+  const cb          = data.circuit_breaker_active;
+
+  panel.innerHTML = `
+    <div class="tb-card${cb ? ' tb-cb-active' : ''}">
+      <div class="tb-header">
+        <span class="tb-badge ${cls}">${escapeHtml(label)}</span>
+        <span class="tb-balance">${escapeHtml(balance)}</span>
+      </div>
+      <div class="tb-row">
+        <span class="tb-label">PnL total</span>
+        <span class="${pnlClass}">${pnlSign}${pnlVal.toFixed(2)} USDT</span>
+      </div>
+      <div class="tb-row">
+        <span class="tb-label">Win rate</span>
+        <span class="tb-val">${escapeHtml(wr)} <span class="tb-muted">(${trades} ops)</span></span>
+      </div>
+      ${cb ? `<div class="tb-cb-warning">⚠️ Circuit breaker activo — dile al asistente "reinicia el trading bot"</div>` : ''}
+    </div>
+  `;
+}
+
 /** Renders today's calendar events in the sidebar. */
 export function renderTodayEvents(events) {
   const list = document.getElementById('today-list');

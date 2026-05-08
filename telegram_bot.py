@@ -17,10 +17,11 @@ _MAX_MSG_LEN = 4000  # Telegram limit is 4096; keep a small margin
 class TelegramBot:
     """Wraps python-telegram-bot for webhook-based operation inside FastAPI."""
 
-    def __init__(self, token: str, webhook_url: str) -> None:
-        self._bot         = Bot(token=token)
-        self._webhook_url = webhook_url.rstrip("/")
-        self._client      = None
+    def __init__(self, token: str, webhook_url: str, allowed_user_id: Optional[int] = None) -> None:
+        self._bot             = Bot(token=token)
+        self._webhook_url     = webhook_url.rstrip("/")
+        self._allowed_user_id = allowed_user_id
+        self._client          = None
         self._model: Optional[str] = None
 
     def set_agent(self, client, model: str) -> None:
@@ -53,6 +54,12 @@ class TelegramBot:
 
         msg = update.message
         chat_id = msg.chat_id
+
+        if self._allowed_user_id is not None:
+            sender_id = msg.from_user.id if msg.from_user else None
+            if sender_id != self._allowed_user_id:
+                log.warning("Telegram: ignored message from unauthorized user %s", sender_id)
+                return
 
         # Handle /start command
         if msg.text and msg.text.strip() == "/start":

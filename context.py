@@ -76,6 +76,14 @@ Hoy es {today.strftime('%A, %d de %B de %Y')}.
   Aeropuerto base del usuario: AGP (Málaga).
   Pareja: en KRK (Kraków) durante mayo; se muda a WRO (Wrocław) el 3 de junio.
   Si el usuario pide vuelos a Cracovia o Wrocław, usa el código correcto según la fecha.
+
+=== SEO BOT ===
+Tienes acceso al SEO Bot (en http://localhost:8002). Es una herramienta de auditoría SEO y captación de clientes.
+- Cuando el usuario pida auditar una web o analizar el SEO de un sitio, usa audit_website.
+- Para lanzar campañas automáticas (buscar negocios en Google, auditarlos y mandarles emails), usa start_seo_campaign.
+- Para ver el estado de una campaña en curso (emails enviados, fallidos, prospects), usa get_seo_campaign_status.
+- Para ver la lista de prospects evaluados con sus puntuaciones SEO, usa get_seo_prospects.
+El SEO Bot busca negocios locales en Google, los evalúa con IA, genera informes PDF personalizados y les manda emails de captación automáticamente.
 """
 
 
@@ -85,4 +93,5 @@ QUICK_ACTIONS: Dict[str, str] = {
     "finances": "Dame un resumen de mi situación financiera: inversiones, ahorros líquidos, gastos mensuales y si estoy en buena trayectoria.",
     "wroclaw":  "¿Cuántos días faltan para mi próxima visita a Wrocław? Dame también un recordatorio de los gastos que implica y si hay algo que deba preparar.",
     "focus":    "¿En qué debería enfocarme hoy? Ten en cuenta mi trabajo, finanzas, relación a distancia y cualquier contexto relevante para darme un plan concreto para el día.",
+    "trading":  "Dame un análisis completo del estado del trading bot: estado actual, posición abierta si hay alguna, PnL total, win rate, historial de trades y si hay algún problema como el circuit breaker activo. Dime también si todo va bien o qué deberíamos ajustar.",
 }

@@ -1,0 +1,483 @@
+2026-04-27 07:00:02,370 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-04-27 07:00:04,574 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:00:04,769 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-04-24T07%3A00%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:00:04,771 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:00:26,967 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:00:27,128 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-04-24T07%3A00%3A26%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:00:27,129 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:01:03,633 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:01:03,798 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-04-24T07%3A01%3A03%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:01:03,801 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:01:42,705 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:01:42,897 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-04-24T07%3A01%3A42%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:01:42,899 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:02:06,570 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:02:06,745 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-04-24T07%3A02%3A06%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:02:06,748 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:02:36,858 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:02:37,022 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-04-24T07%3A02%3A36%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:02:37,025 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:03:08,580 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:03:08,735 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-04-24T07%3A03%3A08%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:03:08,739 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:03:38,458 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:03:38,609 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-04-24T07%3A03%3A38%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:03:38,611 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:04:17,280 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:04:17,438 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-04-24T07%3A04%3A17%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:04:17,440 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:04:50,790 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:04:50,953 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-04-24T07%3A04%3A50%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:04:50,954 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:05:18,236 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:05:18,382 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-04-24T07%3A05%3A18%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:05:18,384 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:05:45,966 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:05:46,130 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-04-24T07%3A05%3A45%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:05:46,133 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:06:13,825 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:06:13,973 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-04-24T07%3A06%3A13%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:06:13,975 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:06:24,558 [INFO] httpx: HTTP Request: POST https://api.telegram.org/bot8693594139:AAF2AZo_I-4ukcHNZlY4zvsIobNgg8lO4ko/sendMessage "HTTP/1.1 200 OK"
+2026-04-27 07:06:24,572 [INFO] modules.stock_alerts: Alert sent for NVO (score=80, margin=24.0%)
+2026-04-27 07:06:38,139 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:06:38,304 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-04-24T07%3A06%3A38%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:06:38,307 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:07:01,606 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-27 07:07:01,760 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-04-24T07%3A07%3A01%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-27 07:07:01,762 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-27 07:07:35,457 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=1
+2026-04-28 07:00:02,896 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-04-28 07:00:04,732 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:00:04,900 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-04-25T07%3A00%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:00:04,904 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:00:34,740 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:00:34,902 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-04-25T07%3A00%3A34%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:00:34,905 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:01:01,423 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:01:01,608 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-04-25T07%3A01%3A01%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:01:01,610 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:01:38,111 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:01:38,364 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-04-25T07%3A01%3A38%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:01:38,367 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:02:12,098 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:02:12,267 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-04-25T07%3A02%3A12%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:02:12,269 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:02:53,457 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:02:53,606 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-04-25T07%3A02%3A53%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:02:53,608 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:03:18,637 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:03:18,802 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-04-25T07%3A03%3A18%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:03:18,803 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:03:45,234 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:03:45,391 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-04-25T07%3A03%3A45%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:03:45,395 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:04:14,642 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:04:14,817 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-04-25T07%3A04%3A14%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:04:14,821 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:04:50,977 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:04:51,134 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-04-25T07%3A04%3A50%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:04:51,137 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:05:28,477 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:05:28,629 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-04-25T07%3A05%3A28%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:05:28,632 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:06:02,483 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:06:02,658 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-04-25T07%3A06%3A02%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:06:02,660 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:06:24,425 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:06:24,569 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-04-25T07%3A06%3A24%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:06:24,571 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:06:34,808 [INFO] modules.stock_alerts: Skipping NVO — alerted within last 7 days
+2026-04-28 07:06:48,378 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:06:48,559 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-04-25T07%3A06%3A48%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:06:48,562 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:07:38,501 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-28 07:07:38,675 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-04-25T07%3A07%3A38%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-28 07:07:38,677 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-28 07:08:01,211 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=0
+2026-04-29 07:00:02,928 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-04-29 07:00:05,357 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:00:05,494 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-04-26T07%3A00%3A05%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:00:05,495 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:00:30,747 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:00:30,914 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-04-26T07%3A00%3A30%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:00:30,917 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:00:58,391 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:00:58,548 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-04-26T07%3A00%3A58%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:00:58,551 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:01:32,507 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:01:32,663 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-04-26T07%3A01%3A32%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:01:32,667 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:01:57,960 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:01:58,157 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-04-26T07%3A01%3A57%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:01:58,159 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:02:42,211 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:02:42,372 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-04-26T07%3A02%3A42%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:02:42,375 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:03:04,511 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:03:04,670 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-04-26T07%3A03%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:03:04,673 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:03:37,227 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:03:37,392 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-04-26T07%3A03%3A37%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:03:37,394 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:04:13,435 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:04:13,593 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-04-26T07%3A04%3A13%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:04:13,595 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:04:48,812 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:04:48,975 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-04-26T07%3A04%3A48%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:04:48,978 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:05:18,982 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:05:19,137 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-04-26T07%3A05%3A18%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:05:19,140 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:05:45,628 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:05:45,778 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-04-26T07%3A05%3A45%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:05:45,781 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:06:09,513 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:06:09,669 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-04-26T07%3A06%3A09%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:06:09,673 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:06:20,930 [INFO] modules.stock_alerts: Skipping NVO — alerted within last 7 days
+2026-04-29 07:06:34,957 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:06:35,110 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-04-26T07%3A06%3A34%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:06:35,111 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:07:05,644 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-29 07:07:05,812 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-04-26T07%3A07%3A05%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-29 07:07:05,815 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-29 07:07:35,619 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=0
+2026-04-30 07:00:02,441 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-04-30 07:00:05,031 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:00:05,201 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-04-27T07%3A00%3A05%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:00:05,204 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:00:36,189 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:00:36,339 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-04-27T07%3A00%3A36%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:00:36,341 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:01:01,222 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:01:01,380 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-04-27T07%3A01%3A01%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:01:01,382 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:01:40,508 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:01:40,667 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-04-27T07%3A01%3A40%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:01:40,670 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:02:06,336 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:02:06,500 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-04-27T07%3A02%3A06%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:02:06,502 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:02:51,369 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:02:51,535 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-04-27T07%3A02%3A51%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:02:51,540 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:03:27,267 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:03:27,417 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-04-27T07%3A03%3A27%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:03:27,420 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:03:53,652 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:03:53,810 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-04-27T07%3A03%3A53%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:03:53,813 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:04:34,223 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:04:34,372 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-04-27T07%3A04%3A34%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:04:34,375 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:04:58,316 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:04:58,479 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-04-27T07%3A04%3A58%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:04:58,481 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:05:26,588 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:05:26,752 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-04-27T07%3A05%3A26%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:05:26,754 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:05:55,974 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:05:56,133 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-04-27T07%3A05%3A55%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:05:56,135 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:06:28,805 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:06:28,954 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-04-27T07%3A06%3A28%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:06:28,956 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:07:00,649 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:07:00,805 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-04-27T07%3A07%3A00%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:07:00,807 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:07:34,433 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-04-30 07:07:34,593 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-04-27T07%3A07%3A34%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-04-30 07:07:34,596 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-04-30 07:07:56,426 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=0
+2026-05-01 07:00:02,249 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-05-01 07:00:04,174 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:00:04,455 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-04-28T07%3A00%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:00:04,461 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:00:43,600 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:00:43,767 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-04-28T07%3A00%3A43%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:00:43,770 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:01:17,856 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:01:18,022 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-04-28T07%3A01%3A17%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:01:18,024 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:01:49,976 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:01:50,140 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-04-28T07%3A01%3A49%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:01:50,141 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:02:17,764 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:02:17,939 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-04-28T07%3A02%3A17%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:02:17,942 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:02:55,184 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:02:55,334 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-04-28T07%3A02%3A55%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:02:55,336 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:03:20,675 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:03:20,832 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-04-28T07%3A03%3A20%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:03:20,835 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:03:51,203 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:03:51,359 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-04-28T07%3A03%3A51%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:03:51,361 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:04:20,624 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:04:20,788 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-04-28T07%3A04%3A20%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:04:20,790 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:04:44,669 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:04:44,821 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-04-28T07%3A04%3A44%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:04:44,822 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:05:20,065 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:05:20,214 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-04-28T07%3A05%3A20%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:05:20,216 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:05:52,141 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:05:52,347 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-04-28T07%3A05%3A52%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:05:52,349 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:06:19,553 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:06:19,710 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-04-28T07%3A06%3A19%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:06:19,714 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:06:31,461 [INFO] modules.stock_alerts: Skipping NVO — alerted within last 7 days
+2026-05-01 07:06:45,088 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:06:45,238 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-04-28T07%3A06%3A45%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:06:45,239 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:07:11,152 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-01 07:07:11,307 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-04-28T07%3A07%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-01 07:07:11,310 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-01 07:07:33,849 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=0
+2026-05-04 07:00:02,768 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-05-04 07:00:05,921 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:00:06,090 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-05-01T07%3A00%3A05%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:00:06,094 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:00:35,691 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:00:35,847 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-05-01T07%3A00%3A35%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:00:35,850 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:01:05,174 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:01:05,331 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-05-01T07%3A01%3A05%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:01:05,334 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:01:41,545 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:01:41,705 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-05-01T07%3A01%3A41%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:01:41,708 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:02:15,798 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:02:15,960 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-05-01T07%3A02%3A15%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:02:15,963 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:02:47,904 [INFO] httpx: HTTP Request: POST https://api.telegram.org/bot8693594139:AAF2AZo_I-4ukcHNZlY4zvsIobNgg8lO4ko/sendMessage "HTTP/1.1 200 OK"
+2026-05-04 07:02:47,915 [INFO] modules.stock_alerts: Alert sent for BRK-B (score=90, margin=99.9%)
+2026-05-04 07:03:01,537 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:03:01,689 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-05-01T07%3A03%3A01%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:03:01,692 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:03:25,759 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:03:25,916 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-05-01T07%3A03%3A25%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:03:25,919 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:03:51,674 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:03:51,844 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-05-01T07%3A03%3A51%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:03:51,846 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:04:21,295 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:04:21,455 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-05-01T07%3A04%3A21%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:04:21,458 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:05:04,036 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:05:04,201 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-05-01T07%3A05%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:05:04,205 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:05:29,548 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:05:29,748 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-05-01T07%3A05%3A29%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:05:29,750 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:05:55,459 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:05:55,614 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-05-01T07%3A05%3A55%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:05:55,617 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:06:20,774 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:06:20,933 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-05-01T07%3A06%3A20%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:06:20,936 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:06:53,709 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:06:53,865 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-05-01T07%3A06%3A53%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:06:53,866 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:07:27,544 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-04 07:07:27,701 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-05-01T07%3A07%3A27%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-04 07:07:27,704 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-04 07:07:49,200 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=1
+2026-05-05 07:00:02,245 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-05-05 07:00:04,431 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:00:04,597 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-05-02T07%3A00%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:00:04,605 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:00:30,209 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:00:30,370 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-05-02T07%3A00%3A30%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:00:30,372 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:01:01,372 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:01:01,519 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-05-02T07%3A01%3A01%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:01:01,522 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:01:37,122 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:01:37,268 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-05-02T07%3A01%3A37%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:01:37,270 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:02:07,282 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:02:07,454 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-05-02T07%3A02%3A07%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:02:07,458 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:02:39,986 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:02:40,135 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-05-02T07%3A02%3A39%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:02:40,137 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:03:14,734 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:03:14,891 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-05-02T07%3A03%3A14%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:03:14,894 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:03:50,394 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:03:50,542 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-05-02T07%3A03%3A50%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:03:50,544 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:04:26,147 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:04:26,315 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-05-02T07%3A04%3A26%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:04:26,318 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:04:49,520 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:04:49,679 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-05-02T07%3A04%3A49%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:04:49,682 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:05:24,002 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:05:24,161 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-05-02T07%3A05%3A24%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:05:24,163 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:05:51,975 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:05:52,170 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-05-02T07%3A05%3A51%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:05:52,172 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:06:15,258 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:06:15,413 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-05-02T07%3A06%3A15%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:06:15,416 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:06:39,725 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:06:39,894 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-05-02T07%3A06%3A39%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:06:39,897 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:07:11,771 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-05 07:07:11,928 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-05-02T07%3A07%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-05 07:07:11,930 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-05 07:07:39,468 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=0
+2026-05-06 07:00:02,693 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-05-06 07:00:04,358 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:00:04,553 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-05-03T07%3A00%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:00:04,556 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:00:30,018 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:00:30,174 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-05-03T07%3A00%3A30%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:00:30,176 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:01:11,096 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:01:11,285 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-05-03T07%3A01%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:01:11,288 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:01:43,899 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:01:44,047 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-05-03T07%3A01%3A43%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:01:44,051 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:02:17,276 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:02:17,434 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-05-03T07%3A02%3A17%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:02:17,435 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:02:49,060 [INFO] modules.stock_alerts: Skipping BRK-B — alerted within last 7 days
+2026-05-06 07:03:02,672 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:03:02,869 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-05-03T07%3A03%3A02%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:03:02,871 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:03:38,792 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:03:38,955 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-05-03T07%3A03%3A38%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:03:38,957 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:04:11,092 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:04:11,272 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-05-03T07%3A04%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:04:11,274 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:04:42,528 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:04:42,684 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-05-03T07%3A04%3A42%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:04:42,687 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:05:15,385 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:05:15,533 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-05-03T07%3A05%3A15%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:05:15,535 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:05:40,678 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:05:40,826 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-05-03T07%3A05%3A40%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:05:40,828 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:06:11,120 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:06:11,289 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-05-03T07%3A06%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:06:11,292 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:06:35,681 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:06:35,837 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-05-03T07%3A06%3A35%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:06:35,839 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:06:50,529 [INFO] httpx: HTTP Request: POST https://api.telegram.org/bot8693594139:AAF2AZo_I-4ukcHNZlY4zvsIobNgg8lO4ko/sendMessage "HTTP/1.1 200 OK"
+2026-05-06 07:06:50,545 [INFO] modules.stock_alerts: Alert sent for NVO (score=75, margin=16.9%)
+2026-05-06 07:07:04,138 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:07:04,285 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-05-03T07%3A07%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:07:04,288 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:07:31,518 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-06 07:07:31,680 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-05-03T07%3A07%3A31%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-06 07:07:31,683 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-06 07:07:58,659 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=1
+2026-05-07 07:00:02,592 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-05-07 07:00:04,638 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:00:04,817 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-05-04T07%3A00%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:00:04,820 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:00:29,010 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:00:29,172 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-05-04T07%3A00%3A29%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:00:29,176 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:01:09,168 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:01:09,327 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-05-04T07%3A01%3A09%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:01:09,330 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:01:45,840 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:01:46,021 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-05-04T07%3A01%3A45%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:01:46,023 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:02:09,026 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:02:09,177 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-05-04T07%3A02%3A09%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:02:09,179 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:02:37,205 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:02:37,348 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-05-04T07%3A02%3A37%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:02:37,351 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:03:04,143 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:03:04,286 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-05-04T07%3A03%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:03:04,287 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:03:40,898 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:03:41,057 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-05-04T07%3A03%3A40%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:03:41,061 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:04:12,944 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:04:13,099 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-05-04T07%3A04%3A12%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:04:13,102 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:04:44,809 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:04:44,963 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-05-04T07%3A04%3A44%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:04:44,966 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:05:12,532 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:05:12,670 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-05-04T07%3A05%3A12%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:05:12,672 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:05:42,074 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:05:42,222 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-05-04T07%3A05%3A42%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:05:42,223 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:06:11,964 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:06:12,113 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-05-04T07%3A06%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:06:12,116 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:06:19,088 [INFO] modules.stock_alerts: Skipping NVO — alerted within last 7 days
+2026-05-07 07:06:32,730 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:06:32,882 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-05-04T07%3A06%3A32%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:06:32,883 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:06:59,880 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-07 07:07:00,039 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-05-04T07%3A06%3A59%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-07 07:07:00,042 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-07 07:07:25,483 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=0
+2026-05-08 07:00:02,828 [INFO] stock_daily: Starting daily analysis: 15 companies (weekend=False)
+2026-05-08 07:00:04,240 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AAPL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:00:04,504 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Apple&from=2026-05-05T07%3A00%3A04%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:00:04,505 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:00:36,336 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MSFT&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:00:36,494 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Microsoft&from=2026-05-05T07%3A00%3A36%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:00:36,497 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:01:03,629 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=GOOGL&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:01:03,785 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Alphabet%20%28Google%29&from=2026-05-05T07%3A01%3A03%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:01:03,787 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:01:45,051 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=AMZN&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:01:45,263 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Amazon&from=2026-05-05T07%3A01%3A45%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:01:45,268 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:02:11,067 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=BRK-B&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:02:11,236 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Berkshire%20Hathaway&from=2026-05-05T07%3A02%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:02:11,239 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:02:42,538 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=KO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:02:42,690 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Coca-Cola&from=2026-05-05T07%3A02%3A42%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:02:42,694 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:03:11,579 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=JNJ&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:03:11,764 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Johnson%20%26%20Johnson&from=2026-05-05T07%3A03%3A11%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:03:11,766 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:03:35,351 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=V&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:03:35,510 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Visa&from=2026-05-05T07%3A03%3A35%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:03:35,512 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:04:15,178 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=META&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:04:15,351 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Meta%20Platforms&from=2026-05-05T07%3A04%3A15%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:04:15,353 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:04:38,450 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVDA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:04:38,599 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Nvidia&from=2026-05-05T07%3A04%3A38%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:04:38,600 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:05:06,184 [INFO] httpx: HTTP Request: POST https://api.telegram.org/bot8693594139:AAF2AZo_I-4ukcHNZlY4zvsIobNgg8lO4ko/sendMessage "HTTP/1.1 200 OK"
+2026-05-08 07:05:06,196 [INFO] modules.stock_alerts: Alert sent for NVDA (score=80, margin=25.0%)
+2026-05-08 07:05:19,600 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=ASML&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:05:19,773 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=ASML%20Holding&from=2026-05-05T07%3A05%3A19%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:05:19,776 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:05:52,036 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=SAP&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:05:52,184 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=SAP&from=2026-05-05T07%3A05%3A52%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:05:52,186 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:06:16,379 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=NVO&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:06:16,534 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Novo%20Nordisk&from=2026-05-05T07%3A06%3A16%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:06:16,536 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:06:40,445 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=RACE&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:06:40,597 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=Ferrari&from=2026-05-05T07%3A06%3A40%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:06:40,599 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:07:05,052 [INFO] httpx: HTTP Request: GET https://www.alphavantage.co/query?function=OVERVIEW&symbol=MC.PA&apikey=VWSZE1GF8LORPGJZ "HTTP/1.1 200 OK"
+2026-05-08 07:07:05,211 [INFO] httpx: HTTP Request: GET https://newsapi.org/v2/everything?q=LVMH&from=2026-05-05T07%3A07%3A05%2B00%3A00&language=en&sortBy=publishedAt&pageSize=5&apiKey=e5c51acd76eb4f5eab049efdcb3810e0 "HTTP/1.1 200 OK"
+2026-05-08 07:07:05,214 [INFO] root: AFC is enabled with max remote calls: 10.
+2026-05-08 07:07:28,599 [INFO] stock_daily: Daily run done: analyzed=15 alerts_sent=1

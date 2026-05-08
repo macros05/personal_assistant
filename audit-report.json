@@ -1,0 +1,173 @@
+{
+  "generatedAt": "2026-04-24T19:12:42.074Z",
+  "meta": {
+    "projectName": "personal_assistant",
+    "projectPath": "/root/personal_assistant",
+    "stack": [
+      "python",
+      "fastapi",
+      "sqlite",
+      "docker"
+    ],
+    "hadClaudeMd": true,
+    "hadReadme": true,
+    "fileCounts": [
+      {
+        "ext": ".py",
+        "count": 16
+      },
+      {
+        "ext": ".js",
+        "count": 4
+      },
+      {
+        "ext": ".json",
+        "count": 3
+      },
+      {
+        "ext": ".md",
+        "count": 2
+      },
+      {
+        "ext": ".html",
+        "count": 2
+      },
+      {
+        "ext": ".backup-2026-04-24t18-57-29",
+        "count": 1
+      },
+      {
+        "ext": ".backup-2026-04-24t19-07-32",
+        "count": 1
+      },
+      {
+        "ext": "(no ext)",
+        "count": 1
+      },
+      {
+        "ext": ".db",
+        "count": 1
+      },
+      {
+        "ext": ".txt",
+        "count": 1
+      },
+      {
+        "ext": ".css",
+        "count": 1
+      }
+    ]
+  },
+  "result": {
+    "overallScore": 92,
+    "summary": "Este proyecto de asistente personal en Python con FastAPI y Gemini 2.5 Flash está excepcionalmente bien estructurado y documentado. Destaca por su detallado `CLAUDE.md` que guía la arquitectura y la calidad del código, y por su integración con múltiples herramientas y APIs. La organización y las directrices existentes facilitan enormemente la colaboración con IA, aunque hay áreas para expandir las normas de ingeniería de software.",
+    "claudeMdScore": 95,
+    "claudeMdIssues": [
+      "Falta una sección dedicada a la estrategia de pruebas (unitarias, integración).",
+      "No se especifican patrones de manejo de errores más allá del uso de `logging`, como la gestión centralizada de excepciones o el tratamiento de errores en la ejecución de herramientas.",
+      "Ausencia de directrices de despliegue e infraestructura, a pesar de la presencia de un `Dockerfile`.",
+      "No hay una sección sobre seguridad, como validación de entradas o gestión de vulnerabilidades.",
+      "Faltan directrices para la gestión de migraciones de la base de datos SQLite.",
+      "No se incluyen estándares o convenciones para el desarrollo del frontend (HTML, CSS, JavaScript).",
+      "La presencia de archivos de respaldo manuales (`CLAUDE.md.backup-2026-04-24T...`) sugiere una gestión de versiones no óptima para los documentos."
+    ],
+    "recommendedSkills": [
+      {
+        "name": "python-fastapi-expert",
+        "description": "El proyecto utiliza FastAPI como su backend principal. Una habilidad experta en FastAPI permitirá optimizar el rendimiento de las rutas existentes, añadir nuevas funcionalidades de manera eficiente y asegurar que se sigan las mejores prácticas en el diseño de APIs.",
+        "installCommand": "npx skills add python-fastapi-expert",
+        "priority": "HIGH"
+      },
+      {
+        "name": "python-asyncio-expert",
+        "description": "Dada la naturaleza asíncrona del proyecto (FastAPI, `asyncio.gather` para la búsqueda de vuelos), esta habilidad es crucial para asegurar que el código asíncrono se escriba de forma óptima, evitando bloqueos y maximizando la concurrencia y el rendimiento.",
+        "installCommand": "npx skills add python-asyncio-expert",
+        "priority": "HIGH"
+      },
+      {
+        "name": "sqlite-database-manager",
+        "description": "Con SQLite como la base de datos principal, esta habilidad facilitaría la gestión del esquema, la optimización de consultas, la implementación de migraciones (si se añade Alembic) y la resolución de problemas relacionados con la persistencia de datos.",
+        "installCommand": "npx skills add sqlite-database-manager",
+        "priority": "MEDIUM"
+      },
+      {
+        "name": "docker-compose-expert",
+        "description": "El proyecto ya utiliza Docker. Esta habilidad permitiría optimizar el `Dockerfile` existente, añadir servicios adicionales (como una base de datos externa o un servicio de monitoreo) y mejorar la orquestación y el despliegue de la aplicación.",
+        "installCommand": "npx skills add docker-compose-expert",
+        "priority": "MEDIUM"
+      },
+      {
+        "name": "google-cloud-api-integrator",
+        "description": "Dada la integración con Google Calendar y potencialmente otras APIs de Google, esta habilidad es útil para gestionar las interacciones con los servicios de Google, incluyendo la autenticación OAuth2, el manejo de cuotas y la extensión de funcionalidades.",
+        "installCommand": "npx skills add google-cloud-api-integrator",
+        "priority": "MEDIUM"
+      },
+      {
+        "name": "telegram-bot-developer",
+        "description": "Para mejorar y extender las funcionalidades del bot de Telegram, esta habilidad permitiría añadir nuevos comandos, manejar interacciones más complejas con el agente y asegurar una experiencia de usuario fluida dentro de la plataforma.",
+        "installCommand": "npx skills add telegram-bot-developer",
+        "priority": "LOW"
+      }
+    ],
+    "recommendedMCPs": [
+      {
+        "name": "add-fastapi-endpoint",
+        "description": "Para añadir rápidamente nuevas rutas API en FastAPI, siguiendo las convenciones del proyecto y las directrices de `main.py`.",
+        "installCommand": "npx mcp add add-fastapi-endpoint",
+        "useCase": "Para añadir una nueva ruta `/briefing-personalizado` que permita al usuario configurar y recibir un resumen matutino con parámetros específicos."
+      },
+      {
+        "name": "create-python-class",
+        "description": "Para generar nuevas clases Python, especialmente para la creación de nuevas herramientas en el directorio `tools/`, siguiendo la estructura y los requisitos de `tools/base.py`.",
+        "installCommand": "npx mcp add create-python-class",
+        "useCase": "Para crear una nueva herramienta `WeatherTool` en `tools/weather.py` que extienda `Tool` y proporcione el pronóstico del tiempo utilizando una API externa."
+      },
+      {
+        "name": "integrate-external-api",
+        "description": "Para integrar nuevas APIs externas, como fuentes adicionales de vuelos o servicios de terceros, asegurando que se sigan los patrones de manejo asíncrono y normalización de datos ya establecidos.",
+        "installCommand": "npx mcp add integrate-external-api",
+        "useCase": "Para añadir una nueva fuente de búsqueda de vuelos, como 'Kayak' o 'eDreams', a `tools/flights.py`, siguiendo el patrón `Multi-Source Flight Search`."
+      },
+      {
+        "name": "add-sqlite-table",
+        "description": "Para extender el esquema de la base de datos SQLite, añadiendo nuevas tablas y campos según sea necesario para nuevas funcionalidades.",
+        "installCommand": "npx mcp add add-sqlite-table",
+        "useCase": "Para añadir una nueva tabla `user_settings` en `assistant.db` que almacene preferencias de usuario como el idioma o la zona horaria."
+      },
+      {
+        "name": "add-frontend-component",
+        "description": "Para crear nuevos componentes de interfaz de usuario en el frontend de Vanilla JS, incluyendo HTML, CSS y JavaScript, y asegurando su integración en `static/index.html`.",
+        "installCommand": "npx mcp add add-frontend-component",
+        "useCase": "Para añadir un nuevo widget en la barra lateral de la interfaz web que muestre un resumen visual de las finanzas del usuario."
+      }
+    ],
+    "claudeMdSuggestions": [
+      {
+        "section": "Testing Strategy",
+        "content": "## Testing Strategy\n- **Unit Tests:** Todas las nuevas funciones y métodos deben tener pruebas unitarias correspondientes usando `pytest`. Enfocarse en la lógica aislada.\n- **Integration Tests:** Para la ejecución de herramientas y las interacciones con APIs, usar `pytest` con `httpx.AsyncClient` para los endpoints de FastAPI y `respx` para simular llamadas a APIs externas.\n- **Datos de Prueba:** Utilizar factories o fixtures para datos de prueba consistentes. Evitar valores hardcodeados.\n- **Cobertura:** Esforzarse por una cobertura de código superior al 80%.",
+        "reason": "Añadir una sección de estrategia de pruebas es crucial para asegurar la mantenibilidad y fiabilidad del código, especialmente en un proyecto con lógica compleja y múltiples integraciones. Esto guiará a Claude Code en la creación de tests robustos y consistentes."
+      },
+      {
+        "section": "Error Handling & Monitoring",
+        "content": "## Error Handling & Monitoring\n- **Manejo Centralizado de Excepciones:** Usar `ExceptionHandler` de FastAPI para un manejo global de errores y respuestas API consistentes.\n- **Errores en la Ejecución de Herramientas:** Las herramientas deben capturar excepciones específicas durante `execute()` y devolver un diccionario de error estandarizado (ej., `{\"error\": \"descripción\", \"detalles\": \"...\"}`) o lanzar excepciones personalizadas que sean capturadas por el bucle del agente.\n- **Niveles de Logging:** Usar niveles de logging apropiados (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`).\n- **Fallos de Servicios Externos:** Implementar reintentos con backoff exponencial para fallos transitorios de APIs externas.",
+        "reason": "Detallar las directrices de manejo de errores y monitoreo es vital para la robustez del asistente. Esto ayudará a Claude Code a implementar mecanismos de resiliencia y a proporcionar información útil y estandarizada en caso de fallos, mejorando la depuración y el mantenimiento."
+      },
+      {
+        "section": "Deployment & Infrastructure",
+        "content": "## Deployment & Infrastructure\n- **Docker:** El `Dockerfile` proporcionado es la forma canónica de contenerizar la aplicación. Asegurarse de que esté optimizado para producción (builds multi-stage, tamaño de imagen mínimo).\n- **Variables de Entorno:** Toda la configuración debe gestionarse mediante variables de entorno (ej., `DATABASE_URL`, `TELEGRAM_TOKEN`), cargadas desde `.env` en desarrollo y proporcionadas por el orquestador en producción.\n- **CI/CD:** Implementar pipelines de CI/CD automatizadas para pruebas, construcción de imágenes Docker y despliegue en entornos de destino.",
+        "reason": "Establecer directrices de despliegue y infraestructura es fundamental para la puesta en producción y el mantenimiento del proyecto. Guía a Claude Code sobre cómo preparar la aplicación para entornos de producción y automatizar el proceso de entrega continua."
+      },
+      {
+        "section": "Database Migrations (SQLite)",
+        "content": "## Database Migrations (SQLite)\n- **Alembic:** Utilizar Alembic para gestionar los cambios de esquema de SQLite de forma controlada.\n- **Flujo de Migración:**\n    1. Crear un nuevo script de migración: `alembic revision --autogenerate -m \"descripción\"`\n    2. Revisar y editar el script generado.\n    3. Aplicar la migración: `alembic upgrade head`\n- **Idempotencia:** Los scripts de migración deben ser idempotentes.",
+        "reason": "Con el uso de SQLite, una estrategia clara para las migraciones de base de datos es esencial para gestionar los cambios de esquema de forma controlada y evitar la corrupción de datos. Esto permitirá a Claude Code realizar modificaciones en la base de datos de manera segura y reproducible."
+      },
+      {
+        "section": "Frontend Development Standards",
+        "content": "## Frontend Development Standards\n- **Estructura:** Los archivos JS, CSS y HTML deben seguir la estructura en `static/`.\n- **JavaScript:** Utilizar módulos ES (`import/export`). Evitar variables globales. Preferir `const` y `let` sobre `var`. Seguir convenciones de nombres camelCase.\n- **CSS:** Utilizar clases descriptivas. Evitar estilos en línea. Priorizar la modularidad y la reutilización.\n- **Accesibilidad:** Asegurar que la interfaz sea accesible (ej., atributos `alt` para imágenes, navegación por teclado).\n- **Rendimiento:** Optimizar imágenes y recursos estáticos. Minimizar el DOM y las operaciones costosas en JS.",
+        "reason": "Aunque el frontend es 'Vanilla JS', establecer estándares es crucial para la consistencia y mantenibilidad del código. Esto guiará a Claude Code en la creación de componentes web limpios, eficientes y accesibles."
+      }
+    ]
+  },
+  "improvedClaudeMd": "# CLAUDE.md — Personal Assistant Project Standards\n\n## Architecture\n- Agent loop lives in `agent.py` — never put business logic in `main.py`\n- Each tool is a class extending `Tool` from `tools/base.py`\n- Tools must implement: `name`, `description`, `schema` (property), `execute(**kwargs) -> dict`\n- Max 6 agent rounds per request (`MAX_TOOL_ROUNDS = 6`) to prevent infinite loops\n- `run_agent()` — full agent loop with history and tool calling (used by `/chat`, `/quick-action`)\n- `run_once()` — one-shot call, no history, no tools (used by `/resumen` briefing)\n\n## Code Quality\n- Type hints on all function signatures and class methods\n- One-line docstring on all public functions and classes\n- `async/await` throughout — never block the event loop; use `asyncio.to_thread` for sync I/O\n- Use `logging` module at module level (`log = logging.getLogger(\"module.name\")`), never `print()`\n- All secrets via `.env` — never hardcoded values in source files\n\n## Adding New Tools\n1. Create `tools/newtool.py` extending `Tool` from `tools/base.py`\n2. Implement `name: str`, `description: str`, `schema` property, `async def execute(**kwargs)`\n3. Register an instance in `tools/registry.py` → `_TOOLS` list\n4. Add status label in `agent.py` → `_STATUS_LABELS` dict\n5. Every `execute()` call is automatically logged to the `tool_calls` SQLite table via `agent.py`\n\n## Flight Search Rules\n- Always filter outbound flights by user work schedule (never suggest during work hours)\n- **Outbound:** only Friday ≥14:30 (work ends 14:00 on Fridays), Saturday, or Sunday\n- **Return:** only Sunday before 22:00, or Monday before 06:00\n- Set `\"optimal\": true` on flights that match the schedule perfectly\n- Flights failing the schedule filter are excluded; if none qualify, fall back to all with `\"no_schedule_match\": true`\n- Sort all results by price ascending within each schedule bucket\n- `origin` and `destination` are now dynamic parameters (default: AGP / WRO)\n- `resolve_iata(code_or_city)` maps city names → IATA codes via `AIRPORT_CODES` dict\n- Partner location: KRK (Kraków) during May → WRO (Wrocław) from June 3rd\n\n## Airport Codes Reference (AIRPORT_CODES dict in tools/flights.py)\n| City | IATA | Accepted city name inputs |\n|------|------|--------------------------|\n| Málaga | AGP | malaga, málaga |\n| Madrid | MAD | madrid |\n| Barcelona | BCN | barcelona |\n| Wrocław | WRO | wroclaw, wrocław, breslavia, breslau |\n| Kraków | KRK | krakow, kraków, cracovia, cracow |\n| Warsaw | WAW | warsaw, varsovia, warszawa |\n| Gdańsk | GDN | gdansk, gdańsk |\n| London | LTN | london |\n| Paris | CDG | paris |\n| Amsterdam | AMS | amsterdam |\n| Lisbon | LIS | lisbon, lisboa |\n\n## Multi-Source Flight Search Pattern\nAll sources run in parallel via `asyncio.gather(return_exceptions=True)`. A failing source\nlogs a warning and is skipped — it never blocks results from other sources.\n\n**Current sources in `tools/flights.py`:**\n| Source | Function | Key required | Search type |\n|--------|----------|--------------|-------------|\n| Ryanair | `_fetch_ryanair()` | No | Date range |\n| Vueling | `_fetch_vueling()` | No | Date range (best-effort; route may not exist) |\n| Google Flights | `_fetch_serpapi()` | `SERPAPI_KEY` | Per schedule date, max 4/call (quota: 100/month free) |\n| Skyscanner | `_fetch_skyscanner()` | `RAPIDAPI_KEY` | Single date (create session + poll) |\n\n**Normalised fare shape** (all sources must return this):\n```python\n{\n    \"date\":           \"YYYY-MM-DD\",\n    \"departure_time\": \"HH:MM\",\n    \"price_eur\":      float,\n    \"flight_number\":  str,   # empty string if unknown\n    \"source\":         str,   # \"Ryanair\" | \"Vueling\" | \"Google Flights\" | \"Skyscanner\"\n}\n```\nThe `\"optimal\"` key is **stamped after merge** by `_tag_schedule()` — source functions must NOT set it.\n\n**Adding a new flight source:**\n1. Write `async def _fetch_yourSource(origin, dest, ...) -> list[dict]` returning normalised fares\n2. Add it to the `asyncio.gather(...)` call in `SearchFlightsTool.execute()`\n3. Add its `(name\n\n---\n\n<!-- Auditoría: sugerencias automáticas -->\n\n## Testing Strategy\n\n## Testing Strategy\n- **Unit Tests:** Todas las nuevas funciones y métodos deben tener pruebas unitarias correspondientes usando `pytest`. Enfocarse en la lógica aislada.\n- **Integration Tests:** Para la ejecución de herramientas y las interacciones con APIs, usar `pytest` con `httpx.AsyncClient` para los endpoints de FastAPI y `respx` para simular llamadas a APIs externas.\n- **Datos de Prueba:** Utilizar factories o fixtures para datos de prueba consistentes. Evitar valores hardcodeados.\n- **Cobertura:** Esforzarse por una cobertura de código superior al 80%.\n\n<!-- reason: Añadir una sección de estrategia de pruebas es crucial para asegurar la mantenibilidad y fiabilidad del código, especialmente en un proyecto con lógica compleja y múltiples integraciones. Esto guiará a Claude Code en la creación de tests robustos y consistentes. -->\n\n## Error Handling & Monitoring\n\n## Error Handling & Monitoring\n- **Manejo Centralizado de Excepciones:** Usar `ExceptionHandler` de FastAPI para un manejo global de errores y respuestas API consistentes.\n- **Errores en la Ejecución de Herramientas:** Las herramientas deben capturar excepciones específicas durante `execute()` y devolver un diccionario de error estandarizado (ej., `{\"error\": \"descripción\", \"detalles\": \"...\"}`) o lanzar excepciones personalizadas que sean capturadas por el bucle del agente.\n- **Niveles de Logging:** Usar niveles de logging apropiados (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`).\n- **Fallos de Servicios Externos:** Implementar reintentos con backoff exponencial para fallos transitorios de APIs externas.\n\n<!-- reason: Detallar las directrices de manejo de errores y monitoreo es vital para la robustez del asistente. Esto ayudará a Claude Code a implementar mecanismos de resiliencia y a proporcionar información útil y estandarizada en caso de fallos, mejorando la depuración y el mantenimiento. -->\n\n## Deployment & Infrastructure\n\n## Deployment & Infrastructure\n- **Docker:** El `Dockerfile` proporcionado es la forma canónica de contenerizar la aplicación. Asegurarse de que esté optimizado para producción (builds multi-stage, tamaño de imagen mínimo).\n- **Variables de Entorno:** Toda la configuración debe gestionarse mediante variables de entorno (ej., `DATABASE_URL`, `TELEGRAM_TOKEN`), cargadas desde `.env` en desarrollo y proporcionadas por el orquestador en producción.\n- **CI/CD:** Implementar pipelines de CI/CD automatizadas para pruebas, construcción de imágenes Docker y despliegue en entornos de destino.\n\n<!-- reason: Establecer directrices de despliegue y infraestructura es fundamental para la puesta en producción y el mantenimiento del proyecto. Guía a Claude Code sobre cómo preparar la aplicación para entornos de producción y automatizar el proceso de entrega continua. -->\n\n## Database Migrations (SQLite)\n\n## Database Migrations (SQLite)\n- **Alembic:** Utilizar Alembic para gestionar los cambios de esquema de SQLite de forma controlada.\n- **Flujo de Migración:**\n    1. Crear un nuevo script de migración: `alembic revision --autogenerate -m \"descripción\"`\n    2. Revisar y editar el script generado.\n    3. Aplicar la migración: `alembic upgrade head`\n- **Idempotencia:** Los scripts de migración deben ser idempotentes.\n\n<!-- reason: Con el uso de SQLite, una estrategia clara para las migraciones de base de datos es esencial para gestionar los cambios de esquema de forma controlada y evitar la corrupción de datos. Esto permitirá a Claude Code realizar modificaciones en la base de datos de manera segura y reproducible. -->\n\n## Frontend Development Standards\n\n## Frontend Development Standards\n- **Estructura:** Los archivos JS, CSS y HTML deben seguir la estructura en `static/`.\n- **JavaScript:** Utilizar módulos ES (`import/export`). Evitar variables globales. Preferir `const` y `let` sobre `var`. Seguir convenciones de nombres camelCase.\n- **CSS:** Utilizar clases descriptivas. Evitar estilos en línea. Priorizar la modularidad y la reutilización.\n- **Accesibilidad:** Asegurar que la interfaz sea accesible (ej., atributos `alt` para imágenes, navegación por teclado).\n- **Rendimiento:** Optimizar imágenes y recursos estáticos. Minimizar el DOM y las operaciones costosas en JS.\n\n<!-- reason: Aunque el frontend es 'Vanilla JS', establecer estándares es crucial para la consistencia y mantenibilidad del código. Esto guiará a Claude Code en la creación de componentes web limpios, eficientes y accesibles. -->\n"
+}

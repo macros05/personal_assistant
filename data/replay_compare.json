@@ -1,0 +1,153 @@
+[
+  {
+    "ticker": "NVDA",
+    "name": "Nvidia",
+    "price": 215.4655,
+    "llm_score": 60,
+    "legacy_score": 60,
+    "new_score": 70,
+    "delta": 10,
+    "legacy_rec": "ESPERAR",
+    "new_rec": "ESPERAR",
+    "confidence": "LOW",
+    "new_flags": [
+      "RELATIVE_VALUE_OPPORTUNITY",
+      "EARNINGS_NEAR",
+      "DATA_DISCREPANCY"
+    ],
+    "all_flags": [
+      "INTRINSIC_FAR_FROM_ANCHOR",
+      "RELATIVE_VALUE_OPPORTUNITY",
+      "EARNINGS_NEAR",
+      "DATA_DISCREPANCY"
+    ],
+    "scoring_detail": {
+      "additive_penalty": 0,
+      "additive_bonus": 10,
+      "phase_adj": 4,
+      "hard_caps_applied": [
+        "DATA_DISCREPANCY"
+      ],
+      "final_cap": 70
+    },
+    "competitors": [
+      "RELATIVE_VALUE_OPPORTUNITY"
+    ],
+    "cycle": "cyclical",
+    "phase_fit": 4,
+    "data_cross": [
+      "DATA_DISCREPANCY"
+    ],
+    "options_flags": [],
+    "catalysts": [
+      "EARNINGS_NEAR"
+    ]
+  },
+  {
+    "ticker": "BRK-B",
+    "name": "Berkshire Hathaway",
+    "price": 478.103,
+    "llm_score": 40,
+    "legacy_score": 40,
+    "new_score": 42,
+    "delta": 2,
+    "legacy_rec": "EVITAR",
+    "new_rec": "EVITAR",
+    "confidence": "LOW",
+    "new_flags": [
+      "PREMIUM_VS_PEERS",
+      "DATA_DISCREPANCY"
+    ],
+    "all_flags": [
+      "PREMIUM_VS_PEERS",
+      "DATA_DISCREPANCY"
+    ],
+    "scoring_detail": {
+      "additive_penalty": 0,
+      "additive_bonus": 0,
+      "phase_adj": 2,
+      "hard_caps_applied": [
+        "PREMIUM_VS_PEERS",
+        "DATA_DISCREPANCY"
+      ],
+      "final_cap": 70
+    },
+    "competitors": [
+      "PREMIUM_VS_PEERS"
+    ],
+    "cycle": "defensive",
+    "phase_fit": 2,
+    "data_cross": [
+      "DATA_DISCREPANCY"
+    ],
+    "options_flags": [],
+    "catalysts": []
+  },
+  {
+    "ticker": "AMD",
+    "name": "AMD",
+    "price": 447.115,
+    "llm_score": 25,
+    "legacy_score": 25,
+    "new_score": 29,
+    "delta": 4,
+    "legacy_rec": "EVITAR",
+    "new_rec": "EVITAR",
+    "confidence": "LOW",
+    "new_flags": [
+      "DATA_DISCREPANCY"
+    ],
+    "all_flags": [
+      "INTRINSIC_FAR_FROM_ANCHOR",
+      "PRICED_FOR_PERFECTION",
+      "ROIC_BELOW_WACC",
+      "DATA_DISCREPANCY"
+    ],
+    "scoring_detail": {
+      "additive_penalty": 0,
+      "additive_bonus": 0,
+      "phase_adj": 4,
+      "hard_caps_applied": [
+        "PRICED_FOR_PERFECTION",
+        "ROIC_BELOW_WACC",
+        "DATA_DISCREPANCY"
+      ],
+      "final_cap": 50
+    },
+    "competitors": [],
+    "cycle": "cyclical",
+    "phase_fit": 4,
+    "data_cross": [
+      "DATA_DISCREPANCY"
+    ],
+    "options_flags": [],
+    "catalysts": []
+  },
+  {
+    "ticker": "PG",
+    "name": "Procter & Gamble",
+    "price": 147.23,
+    "llm_score": 55,
+    "legacy_score": 55,
+    "new_score": 57,
+    "delta": 2,
+    "legacy_rec": "ESPERAR",
+    "new_rec": "ESPERAR",
+    "confidence": "MEDIUM",
+    "new_flags": [],
+    "all_flags": [],
+    "scoring_detail": {
+      "additive_penalty": 0,
+      "additive_bonus": 0,
+      "phase_adj": 2,
+      "hard_caps_applied": [],
+      "final_cap": null
+    },
+    "competitors": [],
+    "cycle": "defensive",
+    "phase_fit": 2,
+    "data_cross": [],
+    "options_flags": [],
+    "catalysts": []
+  }
+]

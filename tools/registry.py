@@ -2,14 +2,38 @@
 from tools.calendar import GetCalendarEventsTool, CreateCalendarEventTool
 from tools.context_tool import UpdateContextTool
 from tools.finances import GetFinancesTool
+from tools.fitness import GetFitnessDataTool
+from tools.flight_tracker import TrackFlightTool
 from tools.flights import SearchFlightsTool
+from tools.seo_bot import (
+    AuditWebsiteTool,
+    GetSEOCampaignStatusTool,
+    GetSEOProspectsTool,
+    StartSEOCampaignTool,
+)
+from tools.trading_bot import (
+    GetTradingStatusTool,
+    GetTradingLogsTool,
+    GetTradingPnlTool,
+    RestartTradingBotTool,
+)
 
 _TOOLS = [
     GetCalendarEventsTool(),
     CreateCalendarEventTool(),
     SearchFlightsTool(),
     GetFinancesTool(),
+    GetFitnessDataTool(),
     UpdateContextTool(),
+    TrackFlightTool(),
+    GetTradingStatusTool(),
+    GetTradingLogsTool(),
+    GetTradingPnlTool(),
+    RestartTradingBotTool(),
+    AuditWebsiteTool(),
+    StartSEOCampaignTool(),
+    GetSEOCampaignStatusTool(),
+    GetSEOProspectsTool(),
 ]
 
 _REGISTRY: dict = {t.name: t for t in _TOOLS}

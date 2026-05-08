@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Asistente Personal · Login</title>
+
+  <!-- Tailwind CSS CDN + shared theme config (see /static/js/tailwind-config.js) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/static/js/tailwind-config.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+
+  <style>
+    /* Mirror of /static/css/main.css :root tokens used by inline styles below.
+       Login page is standalone (no main.css link) for fast first paint. */
+    :root {
+      --accent:        #5b8dee;
+      --accent-dim:    #3a5fba;
+      --accent-violet: #8b5cf6;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    /* Subtle radial glow behind the card */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(91,141,238,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    /* Input focus ring */
+    .login-input:focus {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 3px rgba(91,141,238,.15);
+    }
+  </style>
+</head>
+
+<body class="bg-c-bg text-c-txt font-sans min-h-dvh flex items-center justify-center
+             px-4 antialiased relative"
+      style="padding-bottom:max(24px,env(safe-area-inset-bottom))">
+
+  <!-- Login card -->
+  <div class="w-full max-w-sm bg-c-s1 border border-c-bdr rounded-[20px] p-10 flex flex-col gap-7
+              shadow-[0_24px_64px_rgba(0,0,0,.4),0_0_0_1px_rgba(255,255,255,.03)]
+              animate-cardIn relative">
+
+    <!-- Header -->
+    <div class="flex flex-col items-center gap-4 text-center">
+      <div class="w-14 h-14 rounded-2xl flex items-center justify-center
+                  text-white text-2xl font-bold
+                  shadow-[0_4px_20px_rgba(91,141,238,.35)]"
+           style="background:linear-gradient(135deg,var(--accent),var(--accent-violet))">M</div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-c-txt">Asistente Personal</h1>
+        <p class="text-[13px] text-c-dim mt-1.5">Introduce tus credenciales para continuar</p>
+      </div>
+    </div>
+
+    <!-- Error banner -->
+    {% if error %}
+    <div class="flex items-center justify-center gap-2 animate-shake
+                bg-c-red/10 border border-c-red/30
+                rounded-xl px-4 py-3 text-[13px] text-c-red text-center">
+      ⚠ {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Form -->
+    <form method="post" action="/login" class="flex flex-col gap-4">
+
+      <!-- Username -->
+      <div class="flex flex-col gap-1.5">
+        <label for="username"
+               class="text-[11px] font-semibold uppercase tracking-[.07em] text-c-dim">
+          Usuario
+        </label>
+        <input type="text" id="username" name="username"
+               autocomplete="username"
+               value="{{ username }}" autofocus required
+               class="login-input w-full bg-c-s2 border border-c-bdr rounded-xl px-4 py-3
+                      text-[15px] text-c-txt outline-none min-h-[48px] transition-all
+                      placeholder:text-c-mut" />
+      </div>
+
+      <!-- Password -->
+      <div class="flex flex-col gap-1.5">
+        <label for="password"
+               class="text-[11px] font-semibold uppercase tracking-[.07em] text-c-dim">
+          Contraseña
+        </label>
+        <input type="password" id="password" name="password"
+               autocomplete="current-password" required
+               class="login-input w-full bg-c-s2 border border-c-bdr rounded-xl px-4 py-3
+                      text-[15px] text-c-txt outline-none min-h-[48px] transition-all
+                      placeholder:text-c-mut" />
+      </div>
+
+      <!-- Remember me -->
+      <label class="flex items-center gap-2.5 cursor-pointer select-none min-h-[44px]">
+        <input type="checkbox" name="remember" value="1"
+               class="w-[17px] h-[17px] flex-shrink-0 cursor-pointer accent-c-acc" />
+        <span class="text-[13px] text-c-dim">Recordarme durante 30 días</span>
+      </label>
+
+      <!-- Submit -->
+      <button type="submit"
+              class="w-full bg-c-acc text-white font-semibold text-[15px] rounded-xl
+                     min-h-[50px] mt-1 transition-all
+                     hover:bg-c-accd active:scale-[.97]
+                     shadow-[0_4px_16px_rgba(91,141,238,.3)]
+                     hover:shadow-[0_6px_20px_rgba(91,141,238,.4)]">
+        Entrar →
+      </button>
+
+    </form>
+  </div>
+
+</body>
+</html>

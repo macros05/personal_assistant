@@ -1,0 +1,205 @@
+# CLAUDE.md — Personal Assistant Project Standards
+
+## Architecture
+- Agent loop lives in `agent.py` — never put business logic in `main.py`
+- Each tool is a class extending `Tool` from `tools/base.py`
+- Tools must implement: `name`, `description`, `schema` (property), `execute(**kwargs) -> dict`
+- Max 6 agent rounds per request (`MAX_TOOL_ROUNDS = 6`) to prevent infinite loops
+- `run_agent()` — full agent loop with history and tool calling (used by `/chat`, `/quick-action`)
+- `run_once()` — one-shot call, no history, no tools (used by `/resumen` briefing)
+
+## Code Quality
+- Type hints on all function signatures and class methods
+- One-line docstring on all public functions and classes
+- `async/await` throughout — never block the event loop; use `asyncio.to_thread` for sync I/O
+- Use `logging` module at module level (`log = logging.getLogger("module.name")`), never `print()`
+- All secrets via `.env` — never hardcoded values in source files
+
+## Adding New Tools
+1. Create `tools/newtool.py` extending `Tool` from `tools/base.py`
+2. Implement `name: str`, `description: str`, `schema` property, `async def execute(**kwargs)`
+3. Register an instance in `tools/registry.py` → `_TOOLS` list
+4. Add status label in `agent.py` → `_STATUS_LABELS` dict
+5. Every `execute()` call is automatically logged to the `tool_calls` SQLite table via `agent.py`
+
+## Flight Search Rules
+- Always filter outbound flights by user work schedule (never suggest during work hours)
+- **Outbound:** only Friday ≥14:30 (work ends 14:00 on Fridays), Saturday, or Sunday
+- **Return:** only Sunday before 22:00, or Monday before 06:00
+- Set `"optimal": true` on flights that match the schedule perfectly
+- Flights failing the schedule filter are excluded; if none qualify, fall back to all with `"no_schedule_match": true`
+- Sort all results by price ascending within each schedule bucket
+- `origin` and `destination` are now dynamic parameters (default: AGP / WRO)
+- `resolve_iata(code_or_city)` maps city names → IATA codes via `AIRPORT_CODES` dict
+- Partner location: KRK (Kraków) during May → WRO (Wrocław) from June 3rd
+
+## Airport Codes Reference (AIRPORT_CODES dict in tools/flights.py)
+| City | IATA | Accepted city name inputs |
+|------|------|--------------------------|
+| Málaga | AGP | malaga, málaga |
+| Madrid | MAD | madrid |
+| Barcelona | BCN | barcelona |
+| Wrocław | WRO | wroclaw, wrocław, breslavia, breslau |
+| Kraków | KRK | krakow, kraków, cracovia, cracow |
+| Warsaw | WAW | warsaw, varsovia, warszawa |
+| Gdańsk | GDN | gdansk, gdańsk |
+| London | LTN | london |
+| Paris | CDG | paris |
+| Amsterdam | AMS | amsterdam |
+| Lisbon | LIS | lisbon, lisboa |
+
+## Multi-Source Flight Search Pattern
+All sources run in parallel via `asyncio.gather(return_exceptions=True)`. A failing source
+logs a warning and is skipped — it never blocks results from other sources.
+
+**Current sources in `tools/flights.py`:**
+| Source | Function | Key required | Search type |
+|--------|----------|--------------|-------------|
+| Ryanair | `_fetch_ryanair()` | No | Date range |
+| Vueling | `_fetch_vueling()` | No | Date range (best-effort; route may not exist) |
+| Google Flights | `_fetch_serpapi()` | `SERPAPI_KEY` | Per schedule date, max 4/call (quota: 100/month free) |
+| Skyscanner | `_fetch_skyscanner()` | `RAPIDAPI_KEY` | Single date (create session + poll) |
+
+**Normalised fare shape** (all sources must return this):
+```python
+{
+    "date":           "YYYY-MM-DD",
+    "departure_time": "HH:MM",
+    "price_eur":      float,
+    "flight_number":  str,   # empty string if unknown
+    "source":         str,   # "Ryanair" | "Vueling" | "Google Flights" | "Skyscanner"
+}
+```
+The `"optimal"` key is **stamped after merge** by `_tag_schedule()` — source functions must NOT set it.
+
+**Adding a new flight source:**
+1. Write `async def _fetch_yourSource(origin, dest, ...) -> list[dict]` returning normalised fares
+2. Add it to the `asyncio.gather(...)` call in `SearchFlightsTool.execute()`
+3. Add its `(name, direction)` tuple to `source_names` in the same order
+4. Add a colour class in `index.html` → `.flight-source-tag.yoursource { ... }`
+5. Document it in this table
+
+**Deduplication:** `_merge_and_dedup()` keys on `(date, departure_time)`. Same flight appearing
+in multiple sources keeps the lower price and concatenates source names with ` / `.
+
+**SerpAPI quota:** searches only schedule-friendly dates (`_MAX_SERPAPI_DATES = 4` per call).
+At 1 call/day that's ~120 searches/month — slightly over free tier. Adjust `_MAX_SERPAPI_DATES`
+or cache results if quota becomes an issue.
+
+## Context
+- Always read personal data from the SQLite `contexto` table — never hardcode values
+- `proxima_visita_wroclaw` ISO date drives all countdown calculations in `context.py`
+- `build_system_prompt()` in `context.py` is the single source of truth for the system prompt
+- Context can be updated by the agent via `UpdateContextTool` (stored immediately to DB)
+
+## Database Tables
+- `messages` — conversation history (role, content, timestamp)
+- `contexto` — personal key/value store (clave, valor, actualizado)
+- `tool_calls` — execution log (tool_name, params, result, timestamp); written by `database.log_tool_call()`
+- `flights` — tracked partner flights (flight_number, date, person, origin, destination, scheduled_departure, scheduled_arrival, actual_departure, actual_arrival, status, last_checked, created_at); UNIQUE on (flight_number, date)
+
+## Frontend
+- Dark theme, mobile-first — CSS variables in `:root` (`static/css/main.css`), no inline styles except layout overrides
+- ES modules (`type="module"`) — no global variables; `index.html` contains only markup, `<link>`, and `<script type="module">`
+- Inter font loaded from Google Fonts; falls back to system-ui
+- File structure:
+  - `static/index.html` — markup only; includes `#sidebar-overlay` div and `#sidebar-toggle` button
+  - `static/login.html` — standalone login page (Jinja2 template via `Jinja2Templates`); no external CSS dependency, but loads `/static/js/tailwind-config.js` for theme parity
+  - `static/css/main.css` — all styles; CSS variables at `:root` (canonical palette: `--bg`, `--surface`, `--surface2`, `--accent`, `--accent-violet`, `--accent-dim`, `--accent-glow`, `--text`, `--text-dim`, `--text-muted`, `--green`, `--amber`, `--danger`, `--user-bg`, `--border`, `--border-dim`)
+  - `static/js/tailwind-config.js` — single source of truth for the Tailwind CDN palette (`c-bg`, `c-acc`, `c-vio`, …); loaded by both `index.html` and `login.html` immediately after the CDN script. Hex values mirror `main.css :root` — keep both in sync when changing the palette
+  - `static/js/api.js` — all fetch/SSE calls; exports: `postChat`, `postQuickAction`, `getResumen`, `getVuelos`, `getCalendarEvents`, `getHistory`, `deleteHistory`, `getContexto`, `putContexto`, `deleteContexto`, `getAuthStatus`, `revokeCalendar`, `consumeSSE`
+  - `static/js/ui.js` — DOM helpers; exports: `renderMessage`, `renderFlights`, `renderCalendar`, `renderContexto`, `renderTodayEvents`, `appendTyping`, `showToast`, `hideEmpty`, `scrollToBottom`, `setSendDisabled`, `autoResize`, `removeElement`, `updateTimestamp`, `escapeHtml`, `sourceTag`, `formatFlightDate`
+  - `static/js/app.js` — imports from `api.js` and `ui.js`; owns all event listeners, app state (`isStreaming`, `calState`), sidebar state, and data loaders
+
+**Responsive layout:**
+- Mobile (`max-width: 767px`): sidebar is a fixed-position left drawer (`position: fixed; transform: translateX(-100%)`); opens via hamburger (`#sidebar-toggle`) and `sidebar.classList.add('open')`; backdrop overlay (`#sidebar-overlay`) closes it on tap; quick-action buttons scroll horizontally (`flex-direction: row; overflow-x: auto`)
+- Desktop (`min-width: 768px`): sidebar is a flex item (no fixed positioning); collapsible via `sidebar.classList.add('collapsed')` which sets `width: 0`; hamburger button still toggles it
+- `toggleSidebar()` / `openSidebar()` / `closeSidebar()` in `app.js` — unified logic using `isMobile()` check
+- `maybeCloseSidebar()` called when sending message or triggering quick action on mobile
+
+**Touch & accessibility:**
+- All interactive elements: min `44px` height/width
+- `env(safe-area-inset-bottom)` on input bar and toast for notch/home-bar devices
+- `role="dialog"` and `aria-modal="true"` on context modal
+- `aria-label` on icon-only buttons
+
+**Loading states:**
+- Skeleton shimmer (`.skeleton`, `.skeleton-line`, `.skeleton-block`) shown while flights/calendar/context load
+- Typing indicator (3-dot bounce) while agent is streaming
+
+**Other:**
+- SSE streaming via `consumeSSE(response, bubble, onScroll)` in `api.js`
+- `isStreaming` flag gates all user actions (owned by `app.js`)
+- Quick action buttons use `data-action` attributes; wired up in `app.js` via `querySelectorAll('[data-action]')`
+- Toast appears centered-bottom, not corner, for better mobile visibility
+- Sidebar sections load async on `DOMContentLoaded` — failures are silent
+
+## Telegram Bot
+- Implemented in `telegram_bot.py` as `TelegramBot` class; enabled only when `TELEGRAM_BOT_TOKEN` and `WEBHOOK_URL` are both set in `.env`
+- Webhook is registered automatically on startup (`lifespan`) and deleted on shutdown
+- Incoming updates hit `POST /telegram/webhook` → `TelegramBot.handle_update()` → `run_agent()` → reply
+- `_collect_agent_response()` consumes the SSE async generator and extracts `text` events into a plain string
+- Messages longer than 4000 chars are split into multiple Telegram messages
+- `WEBHOOK_URL` must be a public HTTPS URL reachable by Telegram (use ngrok locally: `ngrok http 8000`)
+- The bot handles `/start` and any free-form text; it shares the same agent, history, and tools as the web interface
+
+## Google Fit Integration
+- `tools/fitness.py` — `GetFitnessDataTool` returns today's `steps`, `sleep_hours`, `avg_heart_rate`, `workouts`, `calories`
+- Reuses `token.json` / `credentials.json` from the calendar OAuth flow; scopes are declared in `tools/calendar.SCOPES`
+- Required scopes (added to the shared list): `fitness.activity.read`, `fitness.sleep.read`, `fitness.heart_rate.read` — existing tokens must re-consent via `/auth/google`
+- Data source: `fitness/v1` — `users.dataset.aggregate` for steps/calories/HR summary, `users.sessions.list` for sleep (activityType 72) and workouts
+- Sleep window spans from 16 h before today's 00:00 up to now, so overnight sleep is counted as today's
+- Morning `/resumen` briefing calls `_fetch_fitness_data()` directly and embeds the summary in the prompt; failure (missing scopes, API error) is silently skipped
+
+## Flight Tracker (Melanie's Flights)
+- `tools/flight_tracker.py` — `TrackFlightTool` (agent-callable) + `fetch_flight_info()` helper
+- `fetch_flight_info(flight_number, date)` calls AviationStack free API; returns `None` if `AVIATIONSTACK_KEY` is unset or on error
+- Status values: `SCHEDULED` · `ACTIVE` · `LANDED` · `DELAYED` · `CANCELLED`
+- Background task `_flight_poll_loop()` in `main.py` polls every 10 minutes for active flights
+- Landing detection: if status transitions to `LANDED`, sends Telegram notification "✈️ Tu pareja ha aterrizado en [IATA]"
+- AviationStack quota: 500 free requests/month — poll loop skips if key is not configured
+- DB helpers in `database.py`: `add_flight`, `get_all_flights`, `get_active_flights`, `update_flight`, `delete_flight`
+
+## SEO Bot Panel
+- Sidebar has 4 SEO Bot buttons that open `#seo-panel` in the main area, hiding `#chat-area`
+- The panel has 4 sub-views (`.seo-view`): `seo-audit-view`, `seo-campaign-view`, `seo-status-view`, `seo-prospects-view`
+- `_showSeoPanel(viewId, title, icon)` / `_hideSeoPanel()` in `app.js` toggle chat/seo visibility
+- All SEO requests proxy through `main.py` which forwards to `http://localhost:8002` with `X-API-Key` header
+- `INTERNAL_SEO_API_KEY` env var is required in `.env`
+- Score badge color: green ≥75, amber 50–74, red <50
+- Prospects table columns: Negocio, Dominio, Score, Email (sent ✓ or —)
+
+## Routes Reference
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/chat` | Agent loop with tool calling |
+| POST | `/quick-action/{action}` | Named prompt shortcuts |
+| GET | `/resumen` | Morning briefing (no history, no tools) |
+| GET | `/vuelos?days=30` | Flight search AGP→WRO + WRO→AGP |
+| GET | `/calendar/events?days=7` | Direct calendar JSON for sidebar |
+| POST | `/calendar/event` | Direct event creation |
+| GET/PUT/DELETE | `/contexto` | Personal context CRUD |
+| GET/DELETE | `/auth/google` | OAuth2 flow |
+| POST | `/telegram/webhook` | Telegram Bot API webhook receiver |
+| POST | `/flights/track` | Add a flight to the tracker |
+| GET | `/flights` | List all tracked flights |
+| GET | `/flights/update` | Manually refresh statuses from AviationStack |
+| DELETE | `/flights/{id}` | Stop tracking a flight |
+| POST | `/seo/audit` | Proxy → SEO service `/audit` |
+| POST | `/seo/campaign` | Proxy → SEO service `/pipeline/run` |
+| GET | `/seo/status` | Proxy → SEO service `/pipeline/status` |
+| GET | `/seo/prospects` | Proxy → SEO service `/outreach/status` |
+
+## Audit & Frontend Decisions (2026-04-24)
+- AIDashboard analyzer (`/root/AIDashboard/analyzer/index.ts`) was run with `--apply --json audit-report.json`. It returned **score 0/100** and an empty `recommendedSkills` / `recommendedMCPs` set because `GEMINI_API_KEY` is not configured in the analyzer's `.env`; without it the LLM-driven recommendations are not produced. Two stack-detected templates were dropped into `.claude/skills/` (`python.md`, `fastapi.md`) — these are generic boilerplate, not project-specific guidance. The analyzer also overwrote `CLAUDE.md` with a truncated copy; the original was restored from `CLAUDE.md.backup-2026-04-24T18-57-29` and this section was added on top.
+- **No skill or MCP installs were performed**, since the analyzer produced no actionable recommendations. To re-run with recommendations, set `GEMINI_API_KEY` in `/root/AIDashboard/.env` and re-execute the analyzer command.
+- **Frontend deduplication:** the Tailwind CDN config was duplicated inline in both `index.html` and `login.html`. It is now extracted to `static/js/tailwind-config.js`. Two new tokens were added: `--accent-violet` (CSS) and `c-vio` (Tailwind) for the M-avatar gradient, replacing the inline `#8b5cf6` literal in both pages.
+- **React migration declined.** Counts: ~1,100 JS lines across `api.js` / `app.js` / `ui.js` and 6 distinct views (chat, login, plus 4 SEO sub-views). This is over the analyzer's stated threshold, but a parallel `personal_assistant_react/` Next.js project would duplicate ~15 backend integrations (OAuth, SSE, Telegram webhook routing, Calendar, Flights, SEO panels, Trading Bot, Flight Tracker) and force two-frontend maintenance for a single-user assistant that already works. The vanilla JS approach stays — keep ES modules, CSS variables, and Tailwind CDN for utility classes.
+
+## Audit Re-run (2026-04-24, 19:07 UTC)
+- Analyzer was re-run with the same flags; result unchanged (score **0/100**, empty `recommendedSkills`, empty `recommendedMCPs`) because `GEMINI_API_KEY` is still not configured in `/root/AIDashboard/.env`. It also overwrote CLAUDE.md again — restored from `CLAUDE.md.backup-2026-04-24T19-07-32` (which was the last pre-overwrite state). **To actually get recommendations, set `GEMINI_API_KEY` before re-running — repeat runs without it are pure noise.**
+- **Frontend consistency pass** — audited all hex literals in `static/`:
+  - Added `--surface-hover: #1e2333` CSS variable; replaced 2 duplicated literals in `ctx-row:hover` and `cal-connect-btn:hover`.
+  - `login.html`: added `--accent-dim` to its mirrored `:root` block and replaced the hardcoded `#3a5fba` on `.login-input:focus`. Replaced the error banner's `text-[#f07080]` + arbitrary rgba values with Tailwind tokens `text-c-red`, `bg-c-red/10`, `border-c-red/30`.
+  - `index.html`: the active quick-action button (`data-action="resumen"`) had inline `style="background:rgba(91,141,238,.1);border-color:rgba(91,141,238,.4);color:#e8eaf0"` — replaced with Tailwind tokens `bg-c-acc/10 border-c-acc/40 text-c-txt` to match the hover variants on the other qa-btns.
+- **Deliberately left as-is:** flight-source brand colors in `main.css` (`#f5a623` Ryanair, `#9b5de5` Vueling, `#00b3e3` Skyscanner) — these are brand identifiers, not inconsistencies. Also `#fff` on accent buttons, `#000` on the green badge, and the `#252a3a` shimmer midpoint — all one-off neutrals that don't warrant tokens.

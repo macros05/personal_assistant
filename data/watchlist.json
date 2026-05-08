@@ -1,0 +1,67 @@
+{
+  "_comment": "Edit this file to add/remove companies. Restart not required - re-read on each run.",
+  "us": [
+    {
+      "ticker": "AAPL",
+      "name": "Apple"
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft"
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet (Google)"
+    },
+    {
+      "ticker": "AMZN",
+      "name": "Amazon"
+    },
+    {
+      "ticker": "BRK-B",
+      "name": "Berkshire Hathaway"
+    },
+    {
+      "ticker": "KO",
+      "name": "Coca-Cola"
+    },
+    {
+      "ticker": "JNJ",
+      "name": "Johnson & Johnson"
+    },
+    {
+      "ticker": "V",
+      "name": "Visa"
+    },
+    {
+      "ticker": "META",
+      "name": "Meta Platforms"
+    },
+    {
+      "ticker": "NVDA",
+      "name": "Nvidia"
+    }
+  ],
+  "eu": [
+    {
+      "ticker": "ASML",
+      "name": "ASML Holding"
+    },
+    {
+      "ticker": "SAP",
+      "name": "SAP"
+    },
+    {
+      "ticker": "NVO",
+      "name": "Novo Nordisk"
+    },
+    {
+      "ticker": "RACE",
+      "name": "Ferrari"
+    },
+    {
+      "ticker": "MC.PA",
+      "name": "LVMH"
+    }
+  ]
+}

@@ -75,62 +75,45 @@ The `"optimal"` key is **stamped after merge** by `_tag_schedule()` — source f
 **Adding a new flight source:**
 1. Write `async def _fetch_yourSource(origin, dest, ...) -> list[dict]` returning normalised fares
 2. Add it to the `asyncio.gather(...)` call in `SearchFlightsTool.execute()`
-3. Add its `(name, direction)` tuple to `source_names` in the same order
-4. Add a colour class in `index.html` → `.flight-source-tag.yoursource { ... }`
-5. Document it in this table
+3. Add its `(name
 
-**Deduplication:** `_merge_and_dedup()` keys on `(date, departure_time)`. Same flight appearing
-in multiple sources keeps the lower price and concatenates source names with ` / `.
+---
 
-**SerpAPI quota:** searches only schedule-friendly dates (`_MAX_SERPAPI_DATES = 4` per call).
-At 1 call/day that's ~120 searches/month — slightly over free tier. Adjust `_MAX_SERPAPI_DATES`
-or cache results if quota becomes an issue.
+<!-- Auditoría: sugerencias automáticas -->
 
-## Context
-- Always read personal data from the SQLite `contexto` table — never hardcode values
-- `proxima_visita_wroclaw` ISO date drives all countdown calculations in `context.py`
-- `build_system_prompt()` in `context.py` is the single source of truth for the system prompt
-- Context can be updated by the agent via `UpdateContextTool` (stored immediately to DB)
+## Code Quality
 
-## Database Tables
-- `messages` — conversation history (role, content, timestamp)
-- `contexto` — personal key/value store (clave, valor, actualizado)
-- `tool_calls` — execution log (tool_name, params, result, timestamp); written by `database.log_tool_call()`
+## Code Quality
+...
+- All secrets via `.env` — never hardcoded values in source files. For Google API credentials, prefer environment variables or a secure secrets manager over `credentials.json` and `token.json`. If `credentials.json` is strictly necessary for OAuth flow, ensure it's handled securely and never committed to Git.
+- Use `pytest` for unit and integration testing. Tests should reside in a `tests/` directory at the project root, mirroring the project structure (e.g., `tests/tools/test_flights.py`). Aim for high test coverage, especially for complex business logic in `agent.py` and `tools/`.
+- Ensure proper error handling with custom exceptions where appropriate, logging errors, and returning meaningful responses to clients.
 
-## Frontend
-- Dark theme, minimal — CSS variables in `:root` (`static/css/main.css`), no inline styles except layout overrides
-- ES modules (`type="module"`) — no global variables; `index.html` contains only markup, `<link>`, and `<script type="module">`
-- File structure:
-  - `static/index.html` — markup only
-  - `static/css/main.css` — all styles
-  - `static/js/api.js` — all fetch/SSE calls; exports: `postChat`, `postQuickAction`, `getResumen`, `getVuelos`, `getCalendarEvents`, `getHistory`, `deleteHistory`, `getContexto`, `putContexto`, `deleteContexto`, `getAuthStatus`, `revokeCalendar`, `consumeSSE`
-  - `static/js/ui.js` — DOM helpers; exports: `renderMessage`, `renderFlights`, `renderCalendar`, `renderContexto`, `renderTodayEvents`, `appendTyping`, `showToast`, `hideEmpty`, `scrollToBottom`, `setSendDisabled`, `autoResize`, `removeElement`, `updateTimestamp`, `escapeHtml`, `sourceTag`, `formatFlightDate`
-  - `static/js/app.js` — imports from `api.js` and `ui.js`; owns all event listeners, app state (`isStreaming`, `calState`), and data loaders
-- SSE streaming via `consumeSSE(response, bubble, onScroll)` in `api.js` — accepts a scroll callback to avoid DOM coupling
-- GET streams (e.g. `/resumen`) use `startStreamingGet(fetchFn)`; POST streams use `startStreaming(fetchFn)` — both accept a fetch function, not a URL string
-- No blocking UI during API calls — `isStreaming` flag gates all user actions (owned by `app.js`)
-- Quick action buttons use `data-action` attributes; wired up in `app.js` via `querySelectorAll('[data-action]')`
-- Mobile responsive: sidebar hides at `max-width: 660px`
-- Sidebar sections load async on `DOMContentLoaded` — failures are silent (calendar/flights may not be available)
+<!-- reason: Aclara la gestión de secretos para `credentials.json` y `token.json` en línea con la directriz de `.env`, introduce un estándar de testing (`pytest`) y la estructura para los tests, y refuerza la importancia del manejo de errores, mejorando la robustez y la seguridad. -->
 
-## Telegram Bot
-- Implemented in `telegram_bot.py` as `TelegramBot` class; enabled only when `TELEGRAM_BOT_TOKEN` and `WEBHOOK_URL` are both set in `.env`
-- Webhook is registered automatically on startup (`lifespan`) and deleted on shutdown
-- Incoming updates hit `POST /telegram/webhook` → `TelegramBot.handle_update()` → `run_agent()` → reply
-- `_collect_agent_response()` consumes the SSE async generator and extracts `text` events into a plain string
-- Messages longer than 4000 chars are split into multiple Telegram messages
-- `WEBHOOK_URL` must be a public HTTPS URL reachable by Telegram (use ngrok locally: `ngrok http 8000`)
-- The bot handles `/start` and any free-form text; it shares the same agent, history, and tools as the web interface
+## Deployment & Operations
 
-## Routes Reference
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/chat` | Agent loop with tool calling |
-| POST | `/quick-action/{action}` | Named prompt shortcuts |
-| GET | `/resumen` | Morning briefing (no history, no tools) |
-| GET | `/vuelos?days=30` | Flight search AGP→WRO + WRO→AGP |
-| GET | `/calendar/events?days=7` | Direct calendar JSON for sidebar |
-| POST | `/calendar/event` | Direct event creation |
-| GET/PUT/DELETE | `/contexto` | Personal context CRUD |
-| GET/DELETE | `/auth/google` | OAuth2 flow |
-| POST | `/telegram/webhook` | Telegram Bot API webhook receiver |
+## Deployment & Operations
+- **Docker**: The `Dockerfile` should be optimized for production, using multi-stage builds to reduce image size and improve security. Ensure environment variables are correctly passed at runtime.
+- **Monitoring**: Implement basic health checks (`/health`) and metrics collection (e.g., Prometheus/Grafana) for key services like the agent loop, tool calls, and API response times.
+- **Database Migrations**: For `assistant.db` schema changes, use a tool like `Alembic` to manage migrations, ensuring smooth updates without data loss.
+
+<!-- reason: Proporciona directrices esenciales para la fase de despliegue y operación, incluyendo optimización de Docker, monitoreo básico y gestión de migraciones de base de datos, aspectos clave para un proyecto en producción. -->
+
+## Frontend Development
+
+## Frontend Development (static/)
+- **Vanilla JS**: Maintain a clean, modular structure for JavaScript files (ES modules) in `static/js/`. Avoid global variables.
+- **CSS**: Use a consistent naming convention (e.g., BEM) and organize styles logically. Prioritize accessibility and responsiveness.
+- **HTML**: Ensure semantic HTML5, accessibility (ARIA attributes), and proper meta tags.
+- **Performance**: Optimize assets (minify JS/CSS, compress images) and lazy-load non-critical resources.
+
+<!-- reason: Establece estándares de calidad y rendimiento para el desarrollo frontend, lo cual es crucial para la interfaz de usuario web del asistente, guiando a Claude en futuras modificaciones o adiciones a `static/`. -->
+
+## Version Control
+
+## Version Control
+- All project files, including `CLAUDE.md`, must be managed under Git. Avoid manual backup files (e.g., `CLAUDE.md.backup-*`) in the repository.
+- Follow conventional commit messages (e.g., `feat: add new feature`, `fix: bugfix`).
+
+<!-- reason: Aborda directamente el problema de los archivos de backup de `CLAUDE.md` y establece una práctica clara de control de versiones, esencial para la colaboración y el historial del proyecto. -->

@@ -1,0 +1,11 @@
+{
+  "ust_3m": 3.5950000286102295,
+  "ust_10y": 4.363999843597412,
+  "ust_2y": 4.015000343322754,
+  "fed_funds_rate": 3.5950000286102295,
+  "source": "yfinance_proxy",
+  "yield_curve_inverted": false,
+  "cycle_phase": "mid_cycle",
+  "valuation_bias": "neutral",
+  "fetched_at": "2026-05-08T16:22:28.992551+00:00"
+}
