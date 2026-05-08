@@ -8,6 +8,7 @@ from google.genai import types
 
 from context import build_system_prompt
 from database import get_all_contexto, get_recent_messages, log_tool_call, save_message
+from gemini_retry import with_retry
 from tools.registry import get_all_tools, get_tool
 
 log = logging.getLogger("agent")
@@ -19,7 +20,13 @@ _STATUS_LABELS: dict[str, str] = {
     "create_calendar_event": "🗓️ Creando evento…",
     "search_flights":        "✈️ Buscando vuelos…",
     "get_finances":          "💰 Consultando finanzas…",
+    "get_fitness_data":      "🏃 Consultando Google Fit…",
     "update_context":        "📝 Actualizando contexto…",
+    "track_flight":          "✈️ Registrando vuelo…",
+    "get_trading_status":    "📈 Consultando estado del bot…",
+    "get_trading_logs":      "📋 Leyendo logs del bot…",
+    "get_trading_pnl":       "💹 Consultando PnL del bot…",
+    "restart_trading_bot":   "🔄 Reiniciando el bot…",
 }
 
 _TYPE_MAP = {
@@ -82,10 +89,13 @@ async def run_agent(
         )
 
         for _ in range(MAX_TOOL_ROUNDS):
-            response = await client.aio.models.generate_content(
-                model=model,
-                contents=contents,
-                config=config,
+            response = await with_retry(
+                lambda: client.aio.models.generate_content(
+                    model=model,
+                    contents=contents,
+                    config=config,
+                ),
+                label="gemini.run_agent",
             )
 
             candidate = response.candidates[0]
@@ -156,10 +166,13 @@ async def run_once(
             system_instruction=system,
             temperature=0.7,
         )
-        response = await client.aio.models.generate_content(
-            model=model,
-            contents=[types.Content(role="user", parts=[types.Part(text=user_message)])],
-            config=config,
+        response = await with_retry(
+            lambda: client.aio.models.generate_content(
+                model=model,
+                contents=[types.Content(role="user", parts=[types.Part(text=user_message)])],
+                config=config,
+            ),
+            label="gemini.run_once",
         )
         text = response.text or ""
         if text:

@@ -2,15 +2,18 @@ import asyncio
 import hmac
 import logging
 import os
+import secrets
+import sys
+import uuid
 from contextlib import asynccontextmanager
-from datetime import date
+from datetime import date, datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
 
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, Form, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from google import genai
@@ -24,17 +27,18 @@ from database import (
     clear_history, delete_contexto_key, get_all_contexto, get_all_messages,
     init_db, seed_contexto_if_empty, upsert_contexto,
     add_flight, get_all_flights, get_active_flights, update_flight, delete_flight,
+    bridge_set, bridge_get,
+    oauth_record_valid, oauth_record_failure, oauth_record_alert_sent, oauth_get_state,
 )
+from health import get_health, BRIDGE_STALE_SECONDS
+from structured_log import CORRELATION_ID, configure_logging
 from telegram_bot import TelegramBot
 from tools.fitness import _fetch_fitness_data
 from tools.flight_tracker import fetch_flight_info
 
 load_dotenv()
+configure_logging()
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-)
 log = logging.getLogger("main")
 
 GEMINI_API_KEY      = os.getenv("GEMINI_API_KEY",      "")
@@ -51,13 +55,41 @@ INTERNAL_SEO_API_KEY = os.getenv("INTERNAL_SEO_API_KEY", "")
 
 _SEO_BASE = os.getenv("SEO_BASE_URL", "http://localhost:8002")
 
+
+def _derive_restart_key() -> str:
+    """Stable cross-container shared secret for /restart auth.
+
+    Both personal_assistant and seobot read the same TELEGRAM_BOT_TOKEN, so we
+    derive the restart key from it via HMAC. This avoids a new env var and the
+    risk of one side knowing a value the other doesn't.
+    """
+    base = TELEGRAM_BOT_TOKEN or "no-token"
+    return hmac.new(b"assistant-restart-v1", base.encode(), "sha256").hexdigest()[:32]
+
+
+INTERNAL_RESTART_KEY = _derive_restart_key()
+
 _serializer = URLSafeTimedSerializer(SECRET_KEY, salt="session")
 _SESSION_COOKIE   = "session"
 _SESSION_MAX_AGE  = 86_400       # 24 h default
 _REMEMBER_MAX_AGE = 86_400 * 30  # 30 days
 
-# Paths that bypass auth — prefix-matched
-_PUBLIC_PREFIXES = ("/login", "/telegram/webhook", "/static", "/auth/callback")
+# Paths that bypass auth — prefix-matched.
+# NOTE: /auth/callback MUST stay public so Google's redirect after consent can
+# complete even if the session cookie has expired. /health is public so an
+# external uptime probe can hit it without credentials. /telegram/* is public
+# because it's authenticated by the secret bot token, not by the dashboard
+# session.
+_PUBLIC_PREFIXES = (
+    "/login",
+    "/telegram/webhook",
+    "/telegram/heartbeat",
+    "/static",
+    "/auth/callback",
+    "/health",
+    "/status",
+    "/restart",
+)
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -139,6 +171,139 @@ async def _flight_poll_loop() -> None:
             log.error("Flight poll error: %s", e)
 
 
+# ── OAuth + bridge resilience loops ──────────────────────────────────────────
+
+OAUTH_CHECK_INTERVAL_S = 24 * 3600
+OAUTH_REALERT_INTERVAL_S = 6 * 3600
+BRIDGE_CHECK_INTERVAL_S = 5 * 60
+
+
+async def _alert_telegram(text: str) -> None:
+    """Best-effort Telegram alert to the admin user. Never raises."""
+    if not (telegram and TELEGRAM_ALLOWED_USER_ID):
+        log.warning("alert: telegram disabled or admin user missing — would have sent: %s", text[:120])
+        return
+    try:
+        await telegram._bot.send_message(chat_id=TELEGRAM_ALLOWED_USER_ID, text=text)
+    except Exception as exc:
+        log.error("alert: telegram send failed: %s", exc)
+
+
+async def _oauth_health_loop() -> None:
+    """Daily probe of Google Calendar OAuth.
+
+    On success: stamp last_valid_at, clear alert state.
+    On failure: stamp last_error, send Telegram alert if none sent yet or if
+    last alert was >6h ago. Surfaces the reauth URL directly in the message so
+    Marcos can recover without SSH'ing into the server.
+    """
+    log.info("OAuth health loop started (every %ds)", OAUTH_CHECK_INTERVAL_S)
+    while True:
+        try:
+            ok = await asyncio.to_thread(calendar.is_authenticated)
+            if ok:
+                await oauth_record_valid("google_calendar")
+                log.info("oauth_health: google_calendar OK")
+            else:
+                await oauth_record_failure("google_calendar", "is_authenticated() returned False")
+                state = await oauth_get_state("google_calendar") or {}
+                last_alert = state.get("last_alert_at")
+                send = True
+                if last_alert:
+                    try:
+                        then = datetime.fromisoformat(last_alert)
+                        if then.tzinfo is None:
+                            then = then.replace(tzinfo=timezone.utc)
+                        send = (datetime.now(timezone.utc) - then).total_seconds() >= OAUTH_REALERT_INTERVAL_S
+                    except Exception:
+                        send = True
+                if send:
+                    reauth = f"{WEBHOOK_URL.rstrip('/')}/auth/google" if WEBHOOK_URL else "/auth/google"
+                    await _alert_telegram(
+                        "⚠️ Google Calendar OAuth necesita reautenticación.\n"
+                        f"Abre: {reauth}\n"
+                        "El asistente seguirá funcionando para el resto de tareas, "
+                        "pero las queries de agenda fallarán hasta que renueves."
+                    )
+                    await oauth_record_alert_sent("google_calendar")
+                    log.warning("oauth_health: alert sent (reauth required)")
+                else:
+                    log.info("oauth_health: still failing, last alert <6h ago — not re-alerting")
+        except Exception as exc:
+            log.error("oauth_health loop error: %s", exc)
+        # On first iteration, wait OAUTH_CHECK_INTERVAL_S; before that we run
+        # one immediate check at startup (handled in lifespan via run-immediately).
+        await asyncio.sleep(OAUTH_CHECK_INTERVAL_S)
+
+
+async def _bridge_health_loop() -> None:
+    """Watch seobot→PA bridge. Alert if both heartbeat and last message are stale.
+
+    Sleeps once before the first iteration so seobot has time to boot and POST
+    its first heartbeat — avoids a false-positive alert on every restart.
+    """
+    log.info("Bridge health loop started (every %ds, stale >%ds, initial grace %ds)",
+             BRIDGE_CHECK_INTERVAL_S, BRIDGE_STALE_SECONDS, BRIDGE_CHECK_INTERVAL_S)
+    await asyncio.sleep(BRIDGE_CHECK_INTERVAL_S)
+    last_alert: Optional[datetime] = None
+    while True:
+        try:
+            now = datetime.now(timezone.utc)
+            hb = await bridge_get("seobot_heartbeat_at")
+            msg = await bridge_get("last_telegram_webhook_at")
+
+            def _age(rec: Optional[dict]) -> Optional[float]:
+                if not rec or not rec.get("value"):
+                    return None
+                try:
+                    then = datetime.fromisoformat(rec["value"])
+                    if then.tzinfo is None:
+                        then = then.replace(tzinfo=timezone.utc)
+                    return (now - then).total_seconds()
+                except Exception:
+                    return None
+
+            ages = [a for a in (_age(hb), _age(msg)) if a is not None]
+            fresh = min(ages) if ages else None
+            stale = (fresh is None) or (fresh > BRIDGE_STALE_SECONDS)
+
+            if stale:
+                # Throttle alerts — at most one per 6h.
+                send = (last_alert is None or
+                        (now - last_alert).total_seconds() >= OAUTH_REALERT_INTERVAL_S)
+                if send:
+                    detail = "nunca recibido" if fresh is None else f"{int(fresh/60)} min sin actividad"
+                    await _alert_telegram(
+                        f"⚠️ Bridge seobot→assistant inactivo ({detail}).\n"
+                        "Revisa que el contenedor seobot esté arriba y que el handler "
+                        "_forward_to_assistant siga registrado."
+                    )
+                    last_alert = now
+                    log.warning("bridge_health: alert sent (%s)", detail)
+            else:
+                if last_alert is not None:
+                    log.info("bridge_health: recovered, clearing alert state")
+                last_alert = None
+        except Exception as exc:
+            log.error("bridge_health loop error: %s", exc)
+        await asyncio.sleep(BRIDGE_CHECK_INTERVAL_S)
+
+
+_background_tasks: list[asyncio.Task] = []
+
+
+async def _oauth_initial_check() -> None:
+    """Run one OAuth check at startup so /health is meaningful immediately."""
+    try:
+        ok = await asyncio.to_thread(calendar.is_authenticated)
+        if ok:
+            await oauth_record_valid("google_calendar")
+        else:
+            await oauth_record_failure("google_calendar", "startup check: is_authenticated()=False")
+    except Exception as exc:
+        log.error("oauth initial check failed: %s", exc)
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     global telegram, _poll_task
@@ -151,25 +316,32 @@ async def lifespan(_app: FastAPI):
         telegram.set_agent(client, GEMINI_MODEL)
         # NOTE: do NOT call setup_webhook() here — seobot owns the bot via long-polling
         # and registering a webhook would race with its getUpdates loop. Free-form
-        # messages reach this service via seobot's _forward_to_assistant forwarder.
+        # messages reach this service via seobot's _forward_to_assistant forwarder
+        # (see ARCHITECTURE.md, "Telegram bridge" section).
         log.info("TelegramBot constructed; webhook handler ready at /telegram/webhook (seobot forwards updates)")
     else:
         log.info("Telegram bot not configured (TELEGRAM_BOT_TOKEN or WEBHOOK_URL missing)")
 
+    await _oauth_initial_check()
     if calendar.is_authenticated():
         log.info("Google Calendar: authenticated")
     else:
         log.warning("Google Calendar: NOT authenticated — visit /auth/google to re-link")
 
     _poll_task = asyncio.create_task(_flight_poll_loop())
+    _background_tasks.append(_poll_task)
+    _background_tasks.append(asyncio.create_task(_oauth_health_loop()))
+    _background_tasks.append(asyncio.create_task(_bridge_health_loop()))
 
     yield
 
-    _poll_task.cancel()
-    try:
-        await _poll_task
-    except asyncio.CancelledError:
-        pass
+    for t in _background_tasks:
+        t.cancel()
+    for t in _background_tasks:
+        try:
+            await t
+        except asyncio.CancelledError:
+            pass
 
     if telegram:
         await telegram.delete_webhook()
@@ -193,6 +365,20 @@ def _is_authenticated(request: Request) -> bool:
         return True
     except (SignatureExpired, BadSignature):
         return False
+
+
+# ── Correlation-ID middleware (runs before auth, so even rejects are traceable) ─
+
+@app.middleware("http")
+async def correlation_id_middleware(request: Request, call_next):
+    cid = request.headers.get("x-correlation-id") or uuid.uuid4().hex[:12]
+    token = CORRELATION_ID.set(cid)
+    try:
+        response = await call_next(request)
+        response.headers["x-correlation-id"] = cid
+        return response
+    finally:
+        CORRELATION_ID.reset(token)
 
 
 # ── Auth middleware ───────────────────────────────────────────────────────────
@@ -419,15 +605,124 @@ async def resumen():
     return StreamingResponse(event_stream(), media_type="text/event-stream", headers=_SSE_HEADERS)
 
 
-# ── Telegram webhook ─────────────────────────────────────────────────────────
+# ── Telegram bridge ──────────────────────────────────────────────────────────
+# This service does NOT poll Telegram. seobot does the long-polling and forwards
+# free-form messages to /telegram/webhook below; it also POSTs /telegram/heartbeat
+# every ~5 minutes so /health can detect a broken bridge even when no real
+# messages arrived. Both endpoints are public (no session) — they are protected
+# by the secret bot token that only seobot's container has access to.
 
 @app.post("/telegram/webhook")
 async def telegram_webhook(request: Request):
     if not telegram:
         raise HTTPException(status_code=503, detail="Telegram bot not configured.")
     update_data = await request.json()
+    await bridge_set("last_telegram_webhook_at", datetime.now(timezone.utc).isoformat())
     await telegram.handle_update(update_data)
     return {"ok": True}
+
+
+@app.post("/telegram/heartbeat")
+async def telegram_heartbeat(request: Request):
+    """Called periodically by seobot to prove the bridge is alive."""
+    payload: dict = {}
+    try:
+        payload = await request.json()
+    except Exception:
+        pass
+    await bridge_set("seobot_heartbeat_at", datetime.now(timezone.utc).isoformat())
+    if payload.get("source"):
+        await bridge_set("seobot_heartbeat_source", str(payload["source"])[:100])
+    return {"ok": True}
+
+
+# ── Health, status, restart ──────────────────────────────────────────────────
+
+@app.get("/health")
+async def health(force: bool = False):
+    """JSON status of all critical services. Public — no auth.
+
+    Returns HTTP 200 on overall=ok, 503 otherwise so external probes can act on
+    the status code alone.
+    """
+    data = await get_health(force=force)
+    code = 200 if data["status"] == "ok" else 503
+    return JSONResponse(data, status_code=code)
+
+
+_STATUS_HTML = """<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Estado del asistente</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--card:#1c2128;--ok:#3fb950;--warn:#d29922;--err:#f85149;--fg:#e6edf3;--mut:#7d8590;--bd:rgba(255,255,255,.08);--accent:#3498db}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,system-ui,sans-serif;padding:24px;max-width:880px;margin:0 auto}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mut);font-size:13px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:16px}
+.card h2{margin:0 0 8px;font-size:14px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.dot.ok{background:var(--ok)}.dot.degraded{background:var(--warn)}.dot.error{background:var(--err)}
+.val{font-size:18px;font-weight:600;margin:4px 0}.det{color:var(--mut);font-size:12px;line-height:1.45;word-break:break-word}
+.banner{padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px;border:1px solid var(--bd)}
+.banner.ok{background:rgba(63,185,80,.10);color:var(--ok)}.banner.degraded{background:rgba(210,153,34,.10);color:var(--warn)}.banner.error{background:rgba(248,81,73,.10);color:var(--err)}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.foot{margin-top:24px;color:var(--mut);font-size:12px}
+</style></head><body>
+<h1>Estado del asistente personal</h1>
+<div class="sub">Auto-refresh cada 30 s · <a href="/health" target="_blank">JSON crudo</a></div>
+<div id="root"></div>
+<div class="foot">Última actualización: <span id="ts">-</span></div>
+<script>
+const REAUTH = "/auth/google";
+async function load(){
+  let d;
+  try{ const r=await fetch('/health?force=1'); d=await r.json(); }
+  catch(e){ document.getElementById('root').innerHTML='<div class="banner error">Error consultando /health: '+e+'</div>'; return; }
+  let html='<div class="banner '+d.status+'">Estado global: <strong>'+d.status.toUpperCase()+'</strong></div>';
+  html+='<div class="grid">';
+  for(const [name,s] of Object.entries(d.services||{})){
+    const cls=s.status||'error';
+    let body='';
+    if(name==='calendar'&&cls==='error'){
+      body+='<div class="det"><a href="'+REAUTH+'">→ Reautenticar Google Calendar</a></div>';
+    }
+    if(s.latency_ms!=null) body+='<div class="det">Latencia: '+s.latency_ms+' ms</div>';
+    if(s.events_today!=null) body+='<div class="det">Eventos hoy: '+s.events_today+'</div>';
+    if(s.last_heartbeat_age_s!=null) body+='<div class="det">Heartbeat: hace '+Math.round(s.last_heartbeat_age_s/60)+' min</div>';
+    if(s.last_message_age_s!=null) body+='<div class="det">Último mensaje: hace '+Math.round(s.last_message_age_s/60)+' min</div>';
+    if(s.username) body+='<div class="det">Bot: @'+s.username+'</div>';
+    if(s.model) body+='<div class="det">Modelo: '+s.model+'</div>';
+    if(s.error) body+='<div class="det">'+(''+s.error).slice(0,160)+'</div>';
+    html+='<div class="card"><h2><span class="dot '+cls+'"></span>'+name+'</h2><div class="val">'+(s.status||'?').toUpperCase()+'</div>'+body+'</div>';
+  }
+  html+='</div>';
+  document.getElementById('root').innerHTML=html;
+  document.getElementById('ts').textContent=new Date().toLocaleString('es-ES');
+}
+load(); setInterval(load,30000);
+</script></body></html>"""
+
+
+@app.get("/status", response_class=HTMLResponse)
+async def status_page():
+    """Lightweight HTML dashboard pulling from /health every 30 s."""
+    return HTMLResponse(_STATUS_HTML)
+
+
+@app.post("/restart")
+async def restart_service(request: Request):
+    """Self-restart by exiting the process. Docker `restart: always` brings it back.
+
+    Auth: requires the X-Restart-Key header to match INTERNAL_RESTART_KEY (env).
+    The seobot /restart Telegram command holds this key in its env and forwards
+    here, so Marcos can restart the assistant from chat without SSH.
+    """
+    key = request.headers.get("x-restart-key", "")
+    if not (key and hmac.compare_digest(key, INTERNAL_RESTART_KEY)):
+        raise HTTPException(status_code=403, detail="forbidden")
+    log.warning("/restart triggered — exiting process for docker restart")
+    asyncio.get_event_loop().call_later(0.3, lambda: os._exit(0))
+    return {"ok": True, "message": "restarting"}
 
 
 # ── Flight tracker ────────────────────────────────────────────────────────────
