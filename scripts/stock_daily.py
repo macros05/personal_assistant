@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT))
 from dotenv import load_dotenv  # noqa: E402
 load_dotenv(ROOT / ".env")
 
-from modules import stock_alerts, stock_analyzer  # noqa: E402
+from modules import stock_alerts, stock_analyzer, macro_context, predictions  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,8 +37,12 @@ async def main() -> int:
         return 1
 
     await stock_alerts.init_db()
+    await predictions.init_predictions_table()
 
     client, model = stock_analyzer.make_gemini_client()
+
+    macro = await macro_context.fetch_macro_context()
+    log.info("Macro: %s", macro_context.format_macro_summary(macro))
 
     sent = 0
     analyzed = 0
@@ -52,6 +56,7 @@ async def main() -> int:
                 gemini_client=client,
                 gemini_model=model,
                 weekend_skip_market=weekend,
+                macro=macro,
             )
         except Exception as e:
             log.exception("Unexpected failure analysing %s: %s", ticker, e)

@@ -17,7 +17,7 @@ load_dotenv(ROOT / ".env")
 
 import httpx  # noqa: E402
 
-from modules import stock_alerts, stock_analyzer, stock_news  # noqa: E402
+from modules import stock_alerts, stock_analyzer, stock_news, macro_context, predictions  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,7 +37,9 @@ async def main() -> int:
         return 1
 
     await stock_alerts.init_db()
+    await predictions.init_predictions_table()
     client, model = stock_analyzer.make_gemini_client()
+    macro = await macro_context.fetch_macro_context()
 
     breaking: list[dict] = []
     async with httpx.AsyncClient(timeout=15.0) as http:
@@ -60,6 +62,7 @@ async def main() -> int:
                 entry["ticker"], entry["name"],
                 gemini_client=client,
                 gemini_model=model,
+                macro=macro,
             )
         except Exception as e:
             log.exception("Re-analysis failed for %s: %s", entry["ticker"], e)

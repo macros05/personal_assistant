@@ -8,6 +8,8 @@ from typing import Optional
 import aiosqlite
 import httpx
 
+from modules import predictions as predictions_mod
+
 log = logging.getLogger("modules.stock_alerts")
 
 _DB_PATH = Path(__file__).resolve().parent.parent / "data" / "stock_alerts_log.db"
@@ -128,7 +130,7 @@ async def record_alert(ticker: str, score: int, price: Optional[float]) -> None:
         await db.commit()
 
 
-def format_alert(analysis: dict) -> str:
+def format_alert(analysis: dict, *, accuracy_line: str = "") -> str:
     """Build the Spanish Telegram message body. Marcos's exact format."""
     name           = analysis.get("name", "")
     ticker         = analysis.get("ticker", "")
@@ -143,6 +145,9 @@ def format_alert(analysis: dict) -> str:
     catalyst       = analysis.get("catalyst") or "Sin titular destacado"
     peers          = analysis.get("peer_context") or ""
     method         = analysis.get("intrinsic_method") or ""
+    macro          = analysis.get("macro") or {}
+    momentum       = analysis.get("momentum") or {}
+    quality        = analysis.get("quality") or {}
 
     def fmt_money(v) -> str:
         return f"${v:.2f}" if isinstance(v, (int, float)) else "N/A"
@@ -154,6 +159,37 @@ def format_alert(analysis: dict) -> str:
     peer_line = f"Peers: {peers}\n" if peers else ""
     method_line = f"Método VI: {method}\n" if method else ""
 
+    macro_line = ""
+    if macro.get("fed_funds_rate") is not None or macro.get("ust_10y") is not None:
+        macro_line = (
+            f"Macro: Fed {fmt_pct(macro.get('fed_funds_rate'))}, "
+            f"UST10y {fmt_pct(macro.get('ust_10y'))}, "
+            f"ciclo {macro.get('cycle_phase', '?')}, "
+            f"sesgo {macro.get('valuation_bias', '?')}\n"
+        )
+
+    momentum_line = ""
+    if momentum.get("available"):
+        momentum_line = (
+            f"Momentum: {momentum.get('trend')}, "
+            f"vs SMA200 {fmt_pct(momentum.get('sma200_ratio'))}, "
+            f"90d {fmt_pct(momentum.get('change_90d'))}\n"
+        )
+
+    quality_line = ""
+    if quality.get("available"):
+        quality_line = (
+            f"Calidad: FCF yield {fmt_pct(quality.get('fcf_yield'))}, "
+            f"Deuda/EBITDA {quality.get('debt_to_ebitda'):.1f}x"
+            if isinstance(quality.get('debt_to_ebitda'), (int, float))
+            else f"Calidad: FCF yield {fmt_pct(quality.get('fcf_yield'))}"
+        )
+        if isinstance(quality.get("roic"), (int, float)) and isinstance(quality.get("wacc"), (int, float)):
+            quality_line += f", ROIC {fmt_pct(quality.get('roic'))} vs WACC {fmt_pct(quality.get('wacc'))}"
+        quality_line += "\n"
+
+    accuracy_footer = f"{accuracy_line}\n" if accuracy_line else ""
+
     return (
         "📊 OPORTUNIDAD DETECTADA\n"
         f"Empresa: {name} ({ticker})\n"
@@ -163,10 +199,14 @@ def format_alert(analysis: dict) -> str:
         f"Puntuación: {score}/100  |  Confianza: {confidence}\n"
         f"Recomendación: {recommendation}\n"
         f"{method_line}"
+        f"{macro_line}"
+        f"{momentum_line}"
+        f"{quality_line}"
         f"Análisis: {reason}\n"
         f"{peer_line}"
         f"Catalizador: {catalyst}\n"
         f"{flag_line}"
+        f"{accuracy_footer}"
         f"{_DISCLAIMER}"
     )
 
@@ -227,8 +267,11 @@ async def maybe_alert(
         log.info("Skipping %s — alerted within last %d days", ticker, cooldown_days)
         return False
 
-    if await send_telegram(format_alert(analysis)):
+    accuracy = await predictions_mod.model_accuracy()
+    accuracy_line = predictions_mod.format_accuracy_line(accuracy)
+    if await send_telegram(format_alert(analysis, accuracy_line=accuracy_line)):
         await record_alert(ticker, score, analysis.get("price"))
+        await predictions_mod.record_prediction(analysis)
         log.info("Alert sent for %s (score=%d, margin=%.1f%%, conf=%s)",
                  ticker, score, margin, confidence)
         return True

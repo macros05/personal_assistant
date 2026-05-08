@@ -1,4 +1,4 @@
-"""Buffett-style value analysis engine: fundamentals + news → Gemini verdict."""
+"""Buffett-style value analysis engine: fundamentals + news + macro + momentum → verdict."""
 import asyncio
 import json
 import logging
@@ -14,6 +14,9 @@ from google import genai
 from google.genai import types
 
 from modules import stock_news
+from modules import macro_context, momentum as momentum_mod, quality as quality_mod
+from modules import early_warning as early_warning_mod
+from modules import predictions as predictions_mod
 
 log = logging.getLogger("modules.stock_analyzer")
 
@@ -55,16 +58,24 @@ indica eso, casi seguro tu valor intrínseco es erróneo o los datos están inco
 Reglas estrictas:
 1. NO confundas tickers. {ticker} aquí es {ticker_disambiguation}.
 2. El valor intrínseco debe estar respaldado por al menos dos métodos: (a) DCF EPS×múltiplo \
-   razonable para el sector, (b) Graham number cuando aplique (sqrt(22.5 × EPS × BookValue)), \
-   (c) comparación con P/E sector. Si EPS o BookValue son negativos, NO uses Graham.
-3. Compara P/E vs el rango sectorial proporcionado. Una mega-cap con P/E dentro del rango \
+   razonable para el sector y el ciclo de tipos actual, (b) Graham number cuando aplique \
+   (sqrt(22.5 × EPS × BookValue)), (c) comparación con P/E sector. Si EPS o BookValue son \
+   negativos, NO uses Graham.
+3. AJUSTA tu múltiplo al ciclo de tipos: con sesgo "conservative" (tipos altos) usa \
+   múltiplos más bajos; con sesgo "aggressive" (tipos bajos) puedes ser un poco más generoso.
+4. Compara P/E vs el rango sectorial proporcionado. Una mega-cap con P/E dentro del rango \
    sectorial NO está infravalorada significativamente.
-4. Ignora noticias irrelevantes (paquetes en PyPI/npm, deportes, ofertas retail, CVEs en \
-   japonés). Solo trata como catalizador noticias claramente sobre la empresa: resultados, \
-   guidance, regulación, M&A, cambios de CEO, demandas materiales, dividendos, recompras.
-5. Si los datos fundamentales tienen huecos (P/E o EPS o BookValue ausentes), refleja eso \
-   en confidence (LOW) y reduce score.
-6. Tu intrinsic_value debe estar denominado en la MISMA moneda que el precio actual.
+5. Considera el contexto de momentum: si fundamentales son fuertes pero el precio está muy \
+   por debajo de su SMA200 con caída sostenida, NO recomiendes COMPRAR todavía — espera \
+   confirmación de suelo. Si el precio está en máximos históricos y muy estirado sobre la \
+   SMA200, exige más margen de seguridad.
+6. Penaliza ROIC < WACC (destruye valor), deuda neta/EBITDA > 3 (salvo utilities/telecos/ \
+   bancos/REITs), insider selling masivo, recortes recientes de guidance.
+7. Ignora noticias irrelevantes. Solo trata como catalizador noticias claramente sobre la \
+   empresa: resultados, guidance, regulación, M&A, cambios de CEO, demandas, dividendos, \
+   recompras.
+8. Si los datos fundamentales tienen huecos, refleja eso en confidence (LOW) y reduce score.
+9. Tu intrinsic_value debe estar denominado en la MISMA moneda que el precio actual.
 
 Responde EXCLUSIVAMENTE con un objeto JSON válido (sin markdown, sin texto adicional):
 {{
@@ -89,7 +100,19 @@ Precio actual: {price}
 Datos fundamentales:
 {fundamentals}
 
-Estimación inicial (ancla, NO definitiva) DCF EPS×15: {dcf_baseline}
+Contexto macro actual:
+{macro_block}
+
+Momentum del precio:
+{momentum_block}
+
+Métricas de calidad de negocio:
+{quality_block}
+
+Señales de alerta temprana:
+{early_warning_block}
+
+Estimación inicial (ancla, NO definitiva) DCF EPS×{dcf_multiplier}: {dcf_baseline}
 Graham number (referencia, solo si EPS y BookValue > 0): {graham}
 
 Últimas noticias relevantes (ya filtradas por relevancia):
@@ -301,10 +324,28 @@ def _data_quality(fund: dict, headlines: list[dict]) -> tuple[str, list[str]]:
     return "LOW", notes
 
 
-def _build_prompt(name: str, ticker: str, fund: dict, headlines: list[dict]) -> tuple[str, str, Optional[float], Optional[float]]:
+_MULTIPLIER_BY_BIAS = {"aggressive": 18.0, "neutral": 15.0, "conservative": 12.0}
+
+
+def _macro_adjusted_multiplier(macro: dict) -> float:
+    return _MULTIPLIER_BY_BIAS.get(macro.get("valuation_bias", "neutral"), 15.0)
+
+
+def _build_prompt(
+    name: str,
+    ticker: str,
+    fund: dict,
+    headlines: list[dict],
+    *,
+    macro: dict,
+    momentum: dict,
+    quality: dict,
+    early_warning: dict,
+) -> tuple[str, str, Optional[float], Optional[float], float]:
     eps         = fund.get("eps")
     book_value  = fund.get("book_value")
-    dcf_baseline = (eps * 15.0) if isinstance(eps, (int, float)) else None
+    multiplier  = _macro_adjusted_multiplier(macro)
+    dcf_baseline = (eps * multiplier) if isinstance(eps, (int, float)) else None
     graham       = _graham_number(eps, book_value)
     sentiment    = _infer_sentiment(headlines)
     hint         = _PEER_HINTS.get(ticker, {})
@@ -339,12 +380,17 @@ def _build_prompt(name: str, ticker: str, fund: dict, headlines: list[dict]) -> 
         price=(f"{fund['price']:.2f} {fund.get('currency') or ''}".strip()
                if isinstance(fund.get("price"), (int, float)) else "N/A"),
         fundamentals=fund_block,
+        macro_block=macro_context.format_macro_summary(macro),
+        momentum_block=momentum_mod.format_momentum_block(momentum),
+        quality_block=quality_mod.format_quality_block(quality),
+        early_warning_block=early_warning_mod.format_early_warning_block(early_warning),
+        dcf_multiplier=f"{multiplier:.0f}",
         dcf_baseline=(f"{dcf_baseline:.2f}" if dcf_baseline is not None else "N/A"),
         graham=(f"{graham:.2f}" if graham is not None else "N/A"),
         news_block=_format_news_block(headlines),
         sentiment=sentiment,
     )
-    return prompt, sentiment, dcf_baseline, graham
+    return prompt, sentiment, dcf_baseline, graham, multiplier
 
 
 _JSON_OBJ_RE = re.compile(r"\{.*\}", re.DOTALL)
@@ -474,6 +520,93 @@ def _reconcile_confidence(verdict: dict, data_quality: str) -> dict:
     return verdict
 
 
+# Hard score caps when these flags fire. The most-restrictive cap wins.
+_HARD_CAPS = {
+    "ROIC_BELOW_WACC":          50,
+    "HIGH_LEVERAGE":            55,
+    "MOMENTUM_DIVERGENCE":      60,
+    "PRICED_FOR_PERFECTION":    65,
+}
+
+# Additive penalties from early-warning signals. HIGH_SHORT_INTEREST is context-only.
+_ADDITIVE_PENALTIES = {
+    "INSIDER_SELLING":          15,
+    "GUIDANCE_CUT":             20,
+    "MARGIN_DETERIORATION":      8,
+    "NEGATIVE_FCF":              5,
+}
+
+
+def _apply_advanced_scoring(verdict: dict, *, momentum: dict, quality: dict,
+                            early_warning: dict, fund: dict) -> dict:
+    """Combine LLM score with quantitative signals; apply additive + hard-cap rules.
+
+    Rules (matching CLAUDE-spec):
+      - Start with LLM score.
+      - Subtract additive penalties (insider selling, guidance cuts, margin trend, FCF).
+      - Apply the lowest of any hard caps in {ROIC<WACC, high leverage, momentum
+        divergence, priced for perfection}.
+      - A score >= 80 therefore requires NONE of the cap flags to fire.
+      - Recommendation downgrades: COMPRAR → ESPERAR if any hard cap fires; ESPERAR →
+        EVITAR if ROIC < WACC AND high leverage both fire (clear value destroyer).
+    """
+    score = int(verdict.get("score", 0) or 0)
+    flags: list[str] = list(verdict.get("flags", []) or [])
+
+    # Pull flags from each signal source, deduped.
+    for src in (momentum, quality, early_warning):
+        for f in (src.get("flags") or []):
+            if f not in flags:
+                flags.append(f)
+
+    additive_penalty = sum(_ADDITIVE_PENALTIES.get(f, 0) for f in flags)
+    score = max(0, score - additive_penalty)
+
+    cap_flags = [f for f in flags if f in _HARD_CAPS]
+    if cap_flags:
+        cap = min(_HARD_CAPS[f] for f in cap_flags)
+        if score > cap:
+            score = cap
+
+    rec = verdict.get("recommendation", "ESPERAR")
+    opportunity = bool(verdict.get("opportunity"))
+
+    if cap_flags and rec == "COMPRAR":
+        rec = "ESPERAR"
+        opportunity = False
+
+    if "ROIC_BELOW_WACC" in flags and "HIGH_LEVERAGE" in flags and rec == "ESPERAR":
+        rec = "EVITAR"
+        opportunity = False
+
+    score = max(0, min(100, score))
+
+    verdict["score"]          = score
+    verdict["recommendation"] = rec
+    verdict["opportunity"]    = opportunity
+    verdict["flags"]          = flags
+    verdict["scoring_detail"] = {
+        "additive_penalty":   additive_penalty,
+        "hard_caps_applied":  cap_flags,
+        "final_cap":          min((_HARD_CAPS[f] for f in cap_flags), default=None),
+    }
+    return verdict
+
+
+def _is_fundamentally_strong(fund: dict, quality: dict) -> bool:
+    """Heuristic gate used by the momentum-divergence flag."""
+    pe   = fund.get("pe_ratio")
+    roe  = fund.get("roe") or quality.get("roe")
+    fcf  = quality.get("fcf_yield")
+    if not isinstance(pe, (int, float)) or pe <= 0:
+        return False
+    if isinstance(roe, (int, float)) and roe >= 0.15:
+        return True
+    if isinstance(fcf, (int, float)) and fcf >= 4.0:
+        return True
+    return False
+
+
 async def analyze_company(
     ticker: str,
     name: str,
@@ -482,8 +615,12 @@ async def analyze_company(
     gemini_model: str,
     http_client: Optional[httpx.AsyncClient] = None,
     weekend_skip_market: bool = False,
+    macro: Optional[dict] = None,
 ) -> Optional[dict]:
-    """Run the full pipeline for one company. Returns analysis dict or None on failure."""
+    """Run the full pipeline for one company. Returns analysis dict or None on failure.
+
+    `macro` can be passed in to avoid re-fetching for every company in a batch run.
+    """
     own_http = http_client is None
     if own_http:
         http_client = httpx.AsyncClient(timeout=15.0)
@@ -500,6 +637,9 @@ async def analyze_company(
         fund["price"] = None  # weekends: skip stale market price; still analyze fundamentals
 
     try:
+        if macro is None:
+            macro = await macro_context.fetch_macro_context(client=http_client)
+
         alpha = await _alpha_overview(http_client, ticker)
         fund = _merge_alpha(fund, alpha)
 
@@ -511,7 +651,31 @@ async def analyze_company(
             log.warning("News fetch failed for %s: %s", ticker, e)
             headlines = []
 
-        prompt, sentiment, dcf_baseline, graham = _build_prompt(name, ticker, fund, headlines)
+        # Wider window for guidance-cut scanning — recent revisions matter most.
+        try:
+            news_180h = await stock_news.fetch_news(
+                name, ticker=ticker, limit=10, hours_back=180, client=http_client,
+            )
+        except Exception:
+            news_180h = headlines
+
+        momentum = await asyncio.to_thread(momentum_mod.compute_momentum, ticker)
+        quality  = await asyncio.to_thread(
+            quality_mod.compute_quality, ticker, fund, macro=macro,
+        )
+        early_warning = await asyncio.to_thread(
+            early_warning_mod.compute_early_warnings, ticker, news_180h,
+        )
+
+        # Tag MOMENTUM_DIVERGENCE / PRICED_FOR_PERFECTION using fundamentals signal.
+        momentum["flags"] = momentum_mod.classify_momentum_flags(
+            momentum, fundamentals_strong=_is_fundamentally_strong(fund, quality),
+        )
+
+        prompt, sentiment, dcf_baseline, graham, multiplier = _build_prompt(
+            name, ticker, fund, headlines,
+            macro=macro, momentum=momentum, quality=quality, early_warning=early_warning,
+        )
         raw = await _ask_gemini(prompt, gemini_client, gemini_model)
         if raw is None:
             return None
@@ -521,6 +685,11 @@ async def analyze_company(
 
         data_quality, dq_notes = _data_quality(fund, headlines)
         verdict = _reconcile_confidence(verdict, data_quality)
+
+        verdict = _apply_advanced_scoring(
+            verdict, momentum=momentum, quality=quality,
+            early_warning=early_warning, fund=fund,
+        )
 
         catalyst = headlines[0]["title"] if headlines else ""
 
@@ -536,6 +705,7 @@ async def analyze_company(
             "recommendation":    verdict["recommendation"],
             "confidence":        verdict["confidence"],
             "flags":             verdict.get("flags", []),
+            "scoring_detail":    verdict.get("scoring_detail", {}),
             "reason":            verdict["reason"],
             "peer_context":      verdict.get("peer_context", ""),
             "data_quality":      data_quality,
@@ -543,8 +713,13 @@ async def analyze_company(
             "catalyst":          catalyst,
             "sentiment":         sentiment,
             "dcf_baseline":      dcf_baseline,
+            "dcf_multiplier":    multiplier,
             "graham_number":     graham,
             "fundamentals":      fund,
+            "macro":             macro,
+            "momentum":          momentum,
+            "quality":           quality,
+            "early_warning":     early_warning,
             "headlines":         headlines,
             "analyzed_at":       datetime.utcnow().isoformat(),
             "raw_payload":       json.dumps(raw, ensure_ascii=False),
