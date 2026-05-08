@@ -17,8 +17,13 @@ from tools.base import Tool
 
 log = logging.getLogger("tools.calendar")
 
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
-REDIRECT_URI = "http://localhost:8000/auth/callback"
+SCOPES = [
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/fitness.activity.read",
+    "https://www.googleapis.com/auth/fitness.sleep.read",
+    "https://www.googleapis.com/auth/fitness.heart_rate.read",
+]
+REDIRECT_URI = "https://assistant.marcosmorales.dev/auth/callback"
 TIMEZONE = "Europe/Madrid"
 
 _BASE = Path(__file__).parent.parent          # project root
@@ -41,12 +46,26 @@ def credentials_file_exists() -> bool:
 
 
 def is_authenticated() -> bool:
+    """True only if token loads AND (is valid OR can refresh successfully)."""
     if not TOKEN_PATH.exists():
         return False
     try:
         creds = Credentials.from_authorized_user_file(str(TOKEN_PATH), SCOPES)
-        return creds.valid or bool(creds.refresh_token)
-    except Exception:
+    except Exception as e:
+        log.warning("token.json unreadable: %s", e)
+        return False
+    if creds.valid:
+        return True
+    if not creds.refresh_token:
+        log.warning("calendar token expired and no refresh_token present")
+        return False
+    try:
+        creds.refresh(Request())
+        TOKEN_PATH.write_text(creds.to_json())
+        log.info("calendar token refreshed successfully")
+        return True
+    except Exception as e:
+        log.error("calendar refresh_token rejected (%s) — re-auth required at /auth/google", e)
         return False
 
 
@@ -67,6 +86,7 @@ def get_auth_url() -> str:
             "No se encontró credentials.json. Descárgalo de Google Cloud Console."
         )
     info = _read_client_info()
+    log.info("OAuth redirect_uri: %s", REDIRECT_URI)
     params = urllib.parse.urlencode({
         "client_id":     info["client_id"],
         "redirect_uri":  REDIRECT_URI,
@@ -214,7 +234,10 @@ class GetCalendarEventsTool(Tool):
 
     async def execute(self, days: int = 7, **_) -> dict[str, Any]:
         if not is_authenticated():
-            return {"error": "Google Calendar no autenticado.", "events": []}
+            return {
+                "error": "Google Calendar no autenticado. Visita https://assistant.marcosmorales.dev/auth/google para reautenticar.",
+                "events": [],
+            }
         return await asyncio.to_thread(_fetch_events, days)
 
 
@@ -249,7 +272,9 @@ class CreateCalendarEventTool(Tool):
         **_,
     ) -> dict[str, Any]:
         if not is_authenticated():
-            return {"error": "Google Calendar no autenticado."}
+            return {
+                "error": "Google Calendar no autenticado. Visita https://assistant.marcosmorales.dev/auth/google para reautenticar.",
+            }
         return await asyncio.to_thread(
             _insert_event, title, date, time, description, duration_minutes
         )
