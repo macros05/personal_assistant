@@ -73,6 +73,10 @@ _serializer = URLSafeTimedSerializer(SECRET_KEY, salt="session")
 _SESSION_COOKIE   = "session"
 _SESSION_MAX_AGE  = 86_400       # 24 h default
 _REMEMBER_MAX_AGE = 86_400 * 30  # 30 days
+# Apex domain so the cookie is sent to every *.marcosmorales.dev subdomain
+# (assistant, polymarket, future SSO consumers). Empty string disables the
+# attribute — useful for local dev on plain localhost.
+_SESSION_COOKIE_DOMAIN = os.getenv("SESSION_COOKIE_DOMAIN", ".marcosmorales.dev")
 
 # Paths that bypass auth — prefix-matched.
 # NOTE: /auth/callback MUST stay public so Google's redirect after consent can
@@ -431,6 +435,7 @@ async def login_submit(
     response.set_cookie(
         _SESSION_COOKIE, token,
         max_age=max_age, httponly=True, secure=True, samesite="lax",
+        domain=_SESSION_COOKIE_DOMAIN or None,
     )
     return response
 
@@ -438,7 +443,7 @@ async def login_submit(
 @app.get("/logout")
 async def logout():
     response = RedirectResponse("/login", status_code=302)
-    response.delete_cookie(_SESSION_COOKIE)
+    response.delete_cookie(_SESSION_COOKIE, domain=_SESSION_COOKIE_DOMAIN or None)
     return response
 
 
