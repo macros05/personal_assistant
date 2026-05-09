@@ -16,6 +16,11 @@ build/
 *.db
 *.sqlite3
 
+# Logs (not portable; rotated locally)
+data/*.log
+data/*.cron.log
+*.log
+
 # Google OAuth credentials & tokens — contain personal secrets
 credentials.json
 token.json

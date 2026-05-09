@@ -75,45 +75,203 @@ The `"optimal"` key is **stamped after merge** by `_tag_schedule()` — source f
 **Adding a new flight source:**
 1. Write `async def _fetch_yourSource(origin, dest, ...) -> list[dict]` returning normalised fares
 2. Add it to the `asyncio.gather(...)` call in `SearchFlightsTool.execute()`
-3. Add its `(name
+3. Add its `(name, direction)` tuple to `source_names` in the same order
+4. Add a colour class in `index.html` → `.flight-source-tag.yoursource { ... }`
+5. Document it in this table
 
----
+**Deduplication:** `_merge_and_dedup()` keys on `(date, departure_time)`. Same flight appearing
+in multiple sources keeps the lower price and concatenates source names with ` / `.
 
-<!-- Auditoría: sugerencias automáticas -->
+**SerpAPI quota:** searches only schedule-friendly dates (`_MAX_SERPAPI_DATES = 4` per call).
+At 1 call/day that's ~120 searches/month — slightly over free tier. Adjust `_MAX_SERPAPI_DATES`
+or cache results if quota becomes an issue.
 
-## Code Quality
+## Context
+- Always read personal data from the SQLite `contexto` table — never hardcode values
+- `proxima_visita_wroclaw` ISO date drives all countdown calculations in `context.py`
+- `build_system_prompt()` in `context.py` is the single source of truth for the system prompt
+- Context can be updated by the agent via `UpdateContextTool` (stored immediately to DB)
 
-## Code Quality
-...
-- All secrets via `.env` — never hardcoded values in source files. For Google API credentials, prefer environment variables or a secure secrets manager over `credentials.json` and `token.json`. If `credentials.json` is strictly necessary for OAuth flow, ensure it's handled securely and never committed to Git.
-- Use `pytest` for unit and integration testing. Tests should reside in a `tests/` directory at the project root, mirroring the project structure (e.g., `tests/tools/test_flights.py`). Aim for high test coverage, especially for complex business logic in `agent.py` and `tools/`.
-- Ensure proper error handling with custom exceptions where appropriate, logging errors, and returning meaningful responses to clients.
+## Database Tables
+- `messages` — conversation history (role, content, timestamp)
+- `contexto` — personal key/value store (clave, valor, actualizado)
+- `tool_calls` — execution log (tool_name, params, result, timestamp); written by `database.log_tool_call()`
+- `flights` — tracked partner flights (flight_number, date, person, origin, destination, scheduled_departure, scheduled_arrival, actual_departure, actual_arrival, status, last_checked, created_at); UNIQUE on (flight_number, date)
 
-<!-- reason: Aclara la gestión de secretos para `credentials.json` y `token.json` en línea con la directriz de `.env`, introduce un estándar de testing (`pytest`) y la estructura para los tests, y refuerza la importancia del manejo de errores, mejorando la robustez y la seguridad. -->
+## Frontend
+- Dark theme, mobile-first — CSS variables in `:root` (`static/css/main.css`), no inline styles except layout overrides
+- ES modules (`type="module"`) — no global variables; `index.html` contains only markup, `<link>`, and `<script type="module">`
+- Inter font loaded from Google Fonts; falls back to system-ui
+- File structure:
+  - `static/index.html` — markup only; includes `#sidebar-overlay` div and `#sidebar-toggle` button
+  - `static/login.html` — standalone login page (Jinja2 template via `Jinja2Templates`); no external CSS dependency, but loads `/static/js/tailwind-config.js` for theme parity
+  - `static/css/main.css` — all styles; CSS variables at `:root` (canonical palette: `--bg`, `--surface`, `--surface2`, `--accent`, `--accent-violet`, `--accent-dim`, `--accent-glow`, `--text`, `--text-dim`, `--text-muted`, `--green`, `--amber`, `--danger`, `--user-bg`, `--border`, `--border-dim`)
+  - `static/js/tailwind-config.js` — single source of truth for the Tailwind CDN palette (`c-bg`, `c-acc`, `c-vio`, …); loaded by both `index.html` and `login.html` immediately after the CDN script. Hex values mirror `main.css :root` — keep both in sync when changing the palette
+  - `static/js/api.js` — all fetch/SSE calls; exports: `postChat`, `postQuickAction`, `getResumen`, `getVuelos`, `getCalendarEvents`, `getHistory`, `deleteHistory`, `getContexto`, `putContexto`, `deleteContexto`, `getAuthStatus`, `revokeCalendar`, `consumeSSE`
+  - `static/js/ui.js` — DOM helpers; exports: `renderMessage`, `renderFlights`, `renderCalendar`, `renderContexto`, `renderTodayEvents`, `appendTyping`, `showToast`, `hideEmpty`, `scrollToBottom`, `setSendDisabled`, `autoResize`, `removeElement`, `updateTimestamp`, `escapeHtml`, `sourceTag`, `formatFlightDate`
+  - `static/js/app.js` — imports from `api.js` and `ui.js`; owns all event listeners, app state (`isStreaming`, `calState`), sidebar state, and data loaders
 
-## Deployment & Operations
+**Responsive layout:**
+- Mobile (`max-width: 767px`): sidebar is a fixed-position left drawer (`position: fixed; transform: translateX(-100%)`); opens via hamburger (`#sidebar-toggle`) and `sidebar.classList.add('open')`; backdrop overlay (`#sidebar-overlay`) closes it on tap; quick-action buttons scroll horizontally (`flex-direction: row; overflow-x: auto`)
+- Desktop (`min-width: 768px`): sidebar is a flex item (no fixed positioning); collapsible via `sidebar.classList.add('collapsed')` which sets `width: 0`; hamburger button still toggles it
+- `toggleSidebar()` / `openSidebar()` / `closeSidebar()` in `app.js` — unified logic using `isMobile()` check
+- `maybeCloseSidebar()` called when sending message or triggering quick action on mobile
 
-## Deployment & Operations
-- **Docker**: The `Dockerfile` should be optimized for production, using multi-stage builds to reduce image size and improve security. Ensure environment variables are correctly passed at runtime.
-- **Monitoring**: Implement basic health checks (`/health`) and metrics collection (e.g., Prometheus/Grafana) for key services like the agent loop, tool calls, and API response times.
-- **Database Migrations**: For `assistant.db` schema changes, use a tool like `Alembic` to manage migrations, ensuring smooth updates without data loss.
+**Touch & accessibility:**
+- All interactive elements: min `44px` height/width
+- `env(safe-area-inset-bottom)` on input bar and toast for notch/home-bar devices
+- `role="dialog"` and `aria-modal="true"` on context modal
+- `aria-label` on icon-only buttons
 
-<!-- reason: Proporciona directrices esenciales para la fase de despliegue y operación, incluyendo optimización de Docker, monitoreo básico y gestión de migraciones de base de datos, aspectos clave para un proyecto en producción. -->
+**Loading states:**
+- Skeleton shimmer (`.skeleton`, `.skeleton-line`, `.skeleton-block`) shown while flights/calendar/context load
+- Typing indicator (3-dot bounce) while agent is streaming
 
-## Frontend Development
+**Other:**
+- SSE streaming via `consumeSSE(response, bubble, onScroll)` in `api.js`
+- `isStreaming` flag gates all user actions (owned by `app.js`)
+- Quick action buttons use `data-action` attributes; wired up in `app.js` via `querySelectorAll('[data-action]')`
+- Toast appears centered-bottom, not corner, for better mobile visibility
+- Sidebar sections load async on `DOMContentLoaded` — failures are silent
 
-## Frontend Development (static/)
-- **Vanilla JS**: Maintain a clean, modular structure for JavaScript files (ES modules) in `static/js/`. Avoid global variables.
-- **CSS**: Use a consistent naming convention (e.g., BEM) and organize styles logically. Prioritize accessibility and responsiveness.
-- **HTML**: Ensure semantic HTML5, accessibility (ARIA attributes), and proper meta tags.
-- **Performance**: Optimize assets (minify JS/CSS, compress images) and lazy-load non-critical resources.
+## Telegram Bot
+- Implemented in `telegram_bot.py` as `TelegramBot` class; enabled only when `TELEGRAM_BOT_TOKEN` and `WEBHOOK_URL` are both set in `.env`
+- Webhook is registered automatically on startup (`lifespan`) and deleted on shutdown
+- Incoming updates hit `POST /telegram/webhook` → `TelegramBot.handle_update()` → `run_agent()` → reply
+- `_collect_agent_response()` consumes the SSE async generator and extracts `text` events into a plain string
+- Messages longer than 4000 chars are split into multiple Telegram messages
+- `WEBHOOK_URL` must be a public HTTPS URL reachable by Telegram (use ngrok locally: `ngrok http 8000`)
+- The bot handles `/start` and any free-form text; it shares the same agent, history, and tools as the web interface
 
-<!-- reason: Establece estándares de calidad y rendimiento para el desarrollo frontend, lo cual es crucial para la interfaz de usuario web del asistente, guiando a Claude en futuras modificaciones o adiciones a `static/`. -->
+## Google Fit Integration
+- `tools/fitness.py` — `GetFitnessDataTool` returns today's `steps`, `sleep_hours`, `avg_heart_rate`, `workouts`, `calories`
+- Reuses `token.json` / `credentials.json` from the calendar OAuth flow; scopes are declared in `tools/calendar.SCOPES`
+- Required scopes (added to the shared list): `fitness.activity.read`, `fitness.sleep.read`, `fitness.heart_rate.read` — existing tokens must re-consent via `/auth/google`
+- Data source: `fitness/v1` — `users.dataset.aggregate` for steps/calories/HR summary, `users.sessions.list` for sleep (activityType 72) and workouts
+- Sleep window spans from 16 h before today's 00:00 up to now, so overnight sleep is counted as today's
+- Morning `/resumen` briefing calls `_fetch_fitness_data()` directly and embeds the summary in the prompt; failure (missing scopes, API error) is silently skipped
+
+## Flight Tracker (Melanie's Flights)
+- `tools/flight_tracker.py` — `TrackFlightTool` (agent-callable) + `fetch_flight_info()` helper
+- `fetch_flight_info(flight_number, date)` calls AviationStack free API; returns `None` if `AVIATIONSTACK_KEY` is unset or on error
+- Status values: `SCHEDULED` · `ACTIVE` · `LANDED` · `DELAYED` · `CANCELLED`
+- Background task `_flight_poll_loop()` in `main.py` polls every 10 minutes for active flights
+- Landing detection: if status transitions to `LANDED`, sends Telegram notification "✈️ Tu pareja ha aterrizado en [IATA]"
+- AviationStack quota: 500 free requests/month — poll loop skips if key is not configured
+- DB helpers in `database.py`: `add_flight`, `get_all_flights`, `get_active_flights`, `update_flight`, `delete_flight`
+
+## SEO Bot Panel
+- Sidebar has 4 SEO Bot buttons that open `#seo-panel` in the main area, hiding `#chat-area`
+- The panel has 4 sub-views (`.seo-view`): `seo-audit-view`, `seo-campaign-view`, `seo-status-view`, `seo-prospects-view`
+- `_showSeoPanel(viewId, title, icon)` / `_hideSeoPanel()` in `app.js` toggle chat/seo visibility
+- All SEO requests proxy through `main.py` which forwards to `http://localhost:8002` with `X-API-Key` header
+- `INTERNAL_SEO_API_KEY` env var is required in `.env`
+- Score badge color: green ≥75, amber 50–74, red <50
+- Prospects table columns: Negocio, Dominio, Score, Email (sent ✓ or —)
+
+## Routes Reference
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/chat` | Agent loop with tool calling |
+| POST | `/quick-action/{action}` | Named prompt shortcuts |
+| GET | `/resumen` | Morning briefing (no history, no tools) |
+| GET | `/vuelos?days=30` | Flight search AGP→WRO + WRO→AGP |
+| GET | `/calendar/events?days=7` | Direct calendar JSON for sidebar |
+| POST | `/calendar/event` | Direct event creation |
+| GET/PUT/DELETE | `/contexto` | Personal context CRUD |
+| GET/DELETE | `/auth/google` | OAuth2 flow |
+| POST | `/telegram/webhook` | Telegram Bot API webhook receiver |
+| POST | `/flights/track` | Add a flight to the tracker |
+| GET | `/flights` | List all tracked flights |
+| GET | `/flights/update` | Manually refresh statuses from AviationStack |
+| DELETE | `/flights/{id}` | Stop tracking a flight |
+| POST | `/seo/audit` | Proxy → SEO service `/audit` |
+| POST | `/seo/campaign` | Proxy → SEO service `/pipeline/run` |
+| GET | `/seo/status` | Proxy → SEO service `/pipeline/status` |
+| GET | `/seo/prospects` | Proxy → SEO service `/outreach/status` |
+
+## Audit & Frontend Decisions (2026-04-24)
+- AIDashboard analyzer (`/root/AIDashboard/analyzer/index.ts`) was run with `--apply --json audit-report.json`. It returned **score 0/100** and an empty `recommendedSkills` / `recommendedMCPs` set because `GEMINI_API_KEY` is not configured in the analyzer's `.env`; without it the LLM-driven recommendations are not produced. Two stack-detected templates were dropped into `.claude/skills/` (`python.md`, `fastapi.md`) — these are generic boilerplate, not project-specific guidance. The analyzer also overwrote `CLAUDE.md` with a truncated copy; the original was restored from a backup and this section was added on top.
+- **No skill or MCP installs were performed**, since the analyzer produced no actionable recommendations. To re-run with recommendations, set `GEMINI_API_KEY` in `/root/AIDashboard/.env` and re-execute the analyzer command.
+- **Frontend deduplication:** the Tailwind CDN config was duplicated inline in both `index.html` and `login.html`. It is now extracted to `static/js/tailwind-config.js`. Two new tokens were added: `--accent-violet` (CSS) and `c-vio` (Tailwind) for the M-avatar gradient, replacing the inline `#8b5cf6` literal in both pages.
+- **React migration declined.** Counts: ~1,100 JS lines across `api.js` / `app.js` / `ui.js` and 6 distinct views (chat, login, plus 4 SEO sub-views). This is over the analyzer's stated threshold, but a parallel `personal_assistant_react/` Next.js project would duplicate ~15 backend integrations (OAuth, SSE, Telegram webhook routing, Calendar, Flights, SEO panels, Trading Bot, Flight Tracker) and force two-frontend maintenance for a single-user assistant that already works. The vanilla JS approach stays — keep ES modules, CSS variables, and Tailwind CDN for utility classes.
+
+## Audit Re-run (2026-04-24, 19:07 UTC)
+- Analyzer was re-run with the same flags; result unchanged (score **0/100**, empty `recommendedSkills`, empty `recommendedMCPs`) because `GEMINI_API_KEY` is still not configured in `/root/AIDashboard/.env`. It also overwrote CLAUDE.md again — restored from backup. **To actually get recommendations, set `GEMINI_API_KEY` before re-running — repeat runs without it are pure noise.**
+- **Frontend consistency pass** — audited all hex literals in `static/`:
+  - Added `--surface-hover: #1e2333` CSS variable; replaced 2 duplicated literals in `ctx-row:hover` and `cal-connect-btn:hover`.
+  - `login.html`: added `--accent-dim` to its mirrored `:root` block and replaced the hardcoded `#3a5fba` on `.login-input:focus`. Replaced the error banner's `text-[#f07080]` + arbitrary rgba values with Tailwind tokens `text-c-red`, `bg-c-red/10`, `border-c-red/30`.
+  - `index.html`: the active quick-action button (`data-action="resumen"`) had inline `style="background:rgba(91,141,238,.1);border-color:rgba(91,141,238,.4);color:#e8eaf0"` — replaced with Tailwind tokens `bg-c-acc/10 border-c-acc/40 text-c-txt` to match the hover variants on the other qa-btns.
+- **Deliberately left as-is:** flight-source brand colors in `main.css` (`#f5a623` Ryanair, `#9b5de5` Vueling, `#00b3e3` Skyscanner) — these are brand identifiers, not inconsistencies. Also `#fff` on accent buttons, `#000` on the green badge, and the `#252a3a` shimmer midpoint — all one-off neutrals that don't warrant tokens.
+
+## Audit Re-run with Gemini (2026-04-24, 19:12 UTC)
+With `GEMINI_API_KEY` set in `/root/AIDashboard/.env`, the analyzer returned real recommendations — **overall score 92/100, CLAUDE.md score 95/100**. The analyzer again truncated CLAUDE.md; restored from backup.
+
+### Skills installed locally at `.claude/skills/` (HIGH + MEDIUM priority)
+| File | Priority | Purpose |
+|------|----------|---------|
+| `python-fastapi-expert.md` | HIGH | Route conventions, SSE streaming, agent integration |
+| `python-asyncio-expert.md` | HIGH | `asyncio.gather(return_exceptions=True)` pattern, background task lifecycle, sync-I/O wrapping |
+| `sqlite-database-manager.md` | MEDIUM | Current schema, sync helpers via `to_thread`, no-ORM rule |
+| `docker-compose-expert.md` | MEDIUM | `docker run` with env file + data volume; when to introduce compose |
+| `google-cloud-api-integrator.md` | MEDIUM | Shared `token.json` for Calendar + Fit; scope list in `tools/calendar.SCOPES`; re-auth on scope change |
+
+Generic stack templates from the first run (`python.md`, `fastapi.md`) remain but the new project-specific skills supersede them. The `telegram-bot-developer` skill (LOW priority) was not created — existing `telegram_bot.py` is small and the conventions are already documented inline.
+
+**Install commands in the analyzer output are not valid.** `npx skills add python-fastapi-expert` fails — the analyzer's skill names are LLM-generated descriptors, not published npm/GitHub packages (verified by running the command). The skill files above were authored locally instead, which is the actually-useful output.
+
+### MCP recommendations (documented, NOT installed)
+The analyzer suggested 5 MCPs via `npx mcp add <name>`. **These commands are unsafe** — the `mcp` npm package resolves to an unrelated, deprecated 2021-era project (`mcp@1.4.2`), not Anthropic's Model Context Protocol. Do not run them.
+
+The *intent* behind each suggestion, captured as workflow guidance:
+
+| Intent | Apply to | How to do it today |
+|--------|----------|---------------------|
+| Add a FastAPI endpoint | New route in `main.py` | Use `.claude/skills/python-fastapi-expert.md` checklist |
+| Create a Python class | New tool in `tools/` | Follow the "Adding New Tools" section above |
+| Integrate an external API | New data source (flights, fitness, etc.) | Async httpx, normalise to existing shape, `asyncio.gather` |
+| Add a SQLite table | Schema change | Use `.claude/skills/sqlite-database-manager.md` |
+| Add a frontend component | New sidebar/panel widget | ES module in `static/js/`, CSS vars from `:root`, Tailwind utilities from `tailwind-config.js` |
+
+If a real Anthropic MCP server is needed later, install it via `claude mcp add` (Claude Code CLI), not `npx mcp add`.
+
+## Testing Strategy
+- **Pragmatic coverage, not 80% mandate.** Priority: tests for `tools/*` execute() paths and the flight-search dedup/schedule-filter logic — these are where correctness bugs hurt most.
+- **Framework:** `pytest` + `pytest-asyncio` for coroutines, `httpx.AsyncClient` for FastAPI endpoints, `respx` to mock outbound HTTP.
+- **No DB mocks** — use a temp SQLite file per test (the schema init is cheap).
+- **OAuth tools (`tools/calendar.py`, `tools/fitness.py`):** mock at the `googleapiclient.discovery.build` boundary; don't hit the real Google APIs in tests.
+- **Fixtures** for common objects: sample `messages` rows, sample Ryanair/Vueling API responses.
+
+## Error Handling & Monitoring
+- **Tool `execute()` contract:** return `{"error": "<short_code>", "details": "<message>"}` on failure; do not raise uncaught exceptions — the agent loop logs them but returns a generic message to the user. See `tools/base.py` for the base wrapper.
+- **FastAPI errors:** raise `HTTPException(status_code, detail=...)` in route handlers. Register a single `@app.exception_handler(Exception)` in `main.py` only if we see unhandled errors in logs — don't add preemptively.
+- **External API retries:** `httpx` transport with `retries=2` is sufficient for transient failures. Do not add full exponential backoff unless a source starts failing in practice.
+- **Logging levels:** `DEBUG` for per-request detail, `INFO` for tool invocations, `WARNING` for a failed data source that was gracefully skipped, `ERROR` for unrecoverable issues. Avoid `CRITICAL`.
+
+## Deployment & Infrastructure
+- **Docker-only deployment.** `Dockerfile` at repo root is the canonical build. `.dockerignore` excludes `.env`, `*.db`, `__pycache__/`, `node_modules/`, and `*.backup-*`.
+- **Env-driven config:** all secrets and integration keys come from `.env`. See `.env.example` for the full list. Never commit `.env` or `token.json`.
+- **Data persistence:** SQLite file must live on a mounted volume (`-v /host/data:/app/data`) or it's lost on container restart.
+- **No CI/CD yet.** This is a single-user app; GitHub Actions or a pipeline is overhead we don't need. If we ever deploy to more than one host, revisit.
+
+## Database Migrations (SQLite)
+- **No Alembic.** The analyzer recommended it; we're not adopting it. Schema is small (4 tables), stable, and a migration framework adds complexity without benefit.
+- **Additive changes:** `CREATE TABLE IF NOT EXISTS` and `ALTER TABLE ... ADD COLUMN` in the init block of `database.py`. Safe to run on every startup.
+- **Destructive changes (rename / drop):** write a one-shot script in `scripts/migrate_YYYY_MM_DD.py`, run manually, commit alongside the code change. Back up `assistant.db` first.
+- **Never edit the DB file directly** — use `sqlite3` CLI or a script; record every schema change in git.
+
+## Frontend Development Standards (supplement)
+The main **Frontend** section above is the canonical reference. Additional standards from the audit:
+- **Accessibility:** All icon-only buttons have `aria-label`. Modals use `role="dialog"` + `aria-modal="true"`. Touch targets ≥ 44×44 px.
+- **Performance:** No build step — relying on Tailwind CDN + ES modules. If bundle size becomes an issue (it won't at current size), revisit by introducing a Vite build, not a React rewrite.
+- **Avoid inline styles** except for dynamic values (e.g., progress-bar widths, `display:none` toggles). All colors go through CSS variables or Tailwind tokens — verified by the consistency pass on 2026-04-24.
 
 ## Version Control
+- All project files, including `CLAUDE.md`, are managed under Git. Manual backup files (e.g., `CLAUDE.md.backup-*`) must NOT live in the repository — archive them outside the working tree if a personal copy is needed.
+- Follow conventional commit messages (e.g., `feat: add new feature`, `fix: bugfix`, `chore: cleanup`).
 
-## Version Control
-- All project files, including `CLAUDE.md`, must be managed under Git. Avoid manual backup files (e.g., `CLAUDE.md.backup-*`) in the repository.
-- Follow conventional commit messages (e.g., `feat: add new feature`, `fix: bugfix`).
-
-<!-- reason: Aborda directamente el problema de los archivos de backup de `CLAUDE.md` y establece una práctica clara de control de versiones, esencial para la colaboración y el historial del proyecto. -->
+## Future MCPs
+For inspecting `assistant.db` without writing Python scripts:
+```
+claude mcp add sqlite -- uvx mcp-server-sqlite --db-path ./assistant.db
+```
