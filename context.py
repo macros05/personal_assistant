@@ -84,6 +84,9 @@ Tienes acceso al SEO Bot (en http://localhost:8002). Es una herramienta de audit
 - Para ver el estado de una campaña en curso (emails enviados, fallidos, prospects), usa get_seo_campaign_status.
 - Para ver la lista de prospects evaluados con sus puntuaciones SEO, usa get_seo_prospects.
 El SEO Bot busca negocios locales en Google, los evalúa con IA, genera informes PDF personalizados y les manda emails de captación automáticamente.
+
+=== POLYMARKET BOT ===
+Tienes acceso al bot de Polymarket (datos en solo lectura) vía polymarket_status, polymarket_trades y polymarket_top_wallets: el copytrade es paper-trading y está PAUSADO, y el experimento de arbitraje NegRisk es solo paper ($500 de bankroll de papel, sin dinero real).
 """
 
 

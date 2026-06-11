@@ -27,6 +27,9 @@ _STATUS_LABELS: dict[str, str] = {
     "get_trading_logs":      "📋 Leyendo logs del bot…",
     "get_trading_pnl":       "💹 Consultando PnL del bot…",
     "restart_trading_bot":   "🔄 Reiniciando el bot…",
+    "polymarket_status":     "🎯 Consultando bot de Polymarket…",
+    "polymarket_trades":     "📊 Leyendo trades de Polymarket…",
+    "polymarket_top_wallets": "👛 Consultando wallets seguidas…",
 }
 
 _TYPE_MAP = {
@@ -122,9 +125,11 @@ async def run_agent(
                 if tool:
                     try:
                         result = await tool.execute(**dict(fc.args))
-                    except Exception as e:
+                    except Exception:
+                        # Full traceback stays in logs; the model only sees a
+                        # short generic message so raw exceptions never reach the user.
                         log.exception("Tool %s raised an exception", fc.name)
-                        result = {"error": str(e)}
+                        result = {"error": "herramienta no disponible temporalmente"}
                 else:
                     result = {"error": f"Herramienta desconocida: {fc.name}"}
 
