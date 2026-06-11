@@ -125,9 +125,11 @@ async def run_agent(
                 if tool:
                     try:
                         result = await tool.execute(**dict(fc.args))
-                    except Exception as e:
+                    except Exception:
+                        # Full traceback stays in logs; the model only sees a
+                        # short generic message so raw exceptions never reach the user.
                         log.exception("Tool %s raised an exception", fc.name)
-                        result = {"error": str(e)}
+                        result = {"error": "herramienta no disponible temporalmente"}
                 else:
                     result = {"error": f"Herramienta desconocida: {fc.name}"}
 
