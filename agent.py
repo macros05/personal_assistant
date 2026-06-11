@@ -27,6 +27,9 @@ _STATUS_LABELS: dict[str, str] = {
     "get_trading_logs":      "📋 Leyendo logs del bot…",
     "get_trading_pnl":       "💹 Consultando PnL del bot…",
     "restart_trading_bot":   "🔄 Reiniciando el bot…",
+    "polymarket_status":     "🎯 Consultando bot de Polymarket…",
+    "polymarket_trades":     "📊 Leyendo trades de Polymarket…",
+    "polymarket_top_wallets": "👛 Consultando wallets seguidas…",
 }
 
 _TYPE_MAP = {

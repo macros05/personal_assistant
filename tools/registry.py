@@ -5,6 +5,11 @@ from tools.finances import GetFinancesTool
 from tools.fitness import GetFitnessDataTool
 from tools.flight_tracker import TrackFlightTool
 from tools.flights import SearchFlightsTool
+from tools.polymarket import (
+    GetPolymarketStatusTool,
+    GetPolymarketTradesTool,
+    GetPolymarketTopWalletsTool,
+)
 from tools.seo_bot import (
     AuditWebsiteTool,
     GetSEOCampaignStatusTool,
@@ -30,6 +35,9 @@ _TOOLS = [
     GetTradingLogsTool(),
     GetTradingPnlTool(),
     RestartTradingBotTool(),
+    GetPolymarketStatusTool(),
+    GetPolymarketTradesTool(),
+    GetPolymarketTopWalletsTool(),
     AuditWebsiteTool(),
     StartSEOCampaignTool(),
     GetSEOCampaignStatusTool(),
